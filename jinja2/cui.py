@@ -175,10 +175,10 @@ def option_parser():
     p.set_defaults(**defaults)
 
     p.add_option("-T", "--template-paths",
-        help="Coron ':' separated template search paths [.]")
+        help="Colon ':' separated template search paths [.]")
     p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-C", "--contexts",
-        help="':' separated data file[s] to instantiate templates"
+        help="Colon ':' separated data file[s] to instantiate templates"
     )
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
 
