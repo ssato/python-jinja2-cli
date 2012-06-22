@@ -18,7 +18,7 @@
    * Neither the name of the author nor the names of its contributors may
      be used to endorse or promote products derived from this software
      without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,6 @@
 
  Requirements: python-jinja2, python-simplejson (python < 2.6) and PyYAML
  References: http://jinja.pocoo.org
-
 """
 import codecs
 import jinja2
@@ -44,12 +43,20 @@ import sys
 
 
 # Borrowed from https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py:
-class InvalidDataFormat(Exception): pass
-class InvalidInputData(Exception): pass
-class MalformedJSON(InvalidInputData): pass
-class MalformedINI(InvalidInputData): pass
-class MalformedYAML(InvalidInputData): pass
-class MalformedQuerystring(InvalidInputData): pass
+class InvalidDataFormat(Exception):
+    pass
+
+
+class InvalidInputData(Exception):
+    pass
+
+
+class MalformedJSON(InvalidInputData):
+    pass
+
+
+class MalformedYAML(InvalidInputData):
+    pass
 
 
 # Data loaders.
@@ -86,12 +93,12 @@ sys.stderr = codecs.getwriter('utf_8')(sys.stderr)
 def get_loader(filepath, loaders=LOADERS):
     file_and_ext = os.path.splitext(filepath)
 
-    if file_and_ext[1]: # ext, e.g. ".yaml"
+    if file_and_ext[1]:  # ext, e.g. ".yaml"
         ldr = loaders.get(file_and_ext[1][1:], False)
         if ldr:
             return ldr
 
-    return None 
+    return None
 
 
 def load_context(filepath):
@@ -171,7 +178,7 @@ def option_parser():
         help="Coron ':' separated template search paths [.]")
     p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-C", "--contexts",
-        help="Coron ':' separated context data file[s] to instantiate templates"
+        help="':' separated data file[s] to instantiate templates"
     )
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
 
