@@ -2,6 +2,6 @@
 import jinja2.cui
 import sys
 
-jinja2.cui(sys.argv)
+jinja2.cui.main(sys.argv)
 
 # vim:sw=4:ts=4:et:
