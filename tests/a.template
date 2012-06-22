@@ -1,0 +1,6 @@
+<html>
+{% block header %}{% endblock %}
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

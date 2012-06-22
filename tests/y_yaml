@@ -1,0 +1,3 @@
+users:
+  - {url: "http://www.example.com", username: foo}
+  - {url: "http://www.example.co.jp", username: bar}
