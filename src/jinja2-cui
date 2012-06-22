@@ -1,0 +1,7 @@
+#! /usr/bin/python
+import jinja2.cui
+import sys
+
+jinja2.cui(sys.argv)
+
+# vim:sw=4:ts=4:et:
