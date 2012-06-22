@@ -90,23 +90,31 @@ sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
 sys.stderr = codecs.getwriter('utf_8')(sys.stderr)
 
 
-def get_loader(filepath, loaders=LOADERS):
-    file_and_ext = os.path.splitext(filepath)
+def get_fileext(filepath):
+    """
+    >>> get_fileext("a.json")
+    'json'
+    >>> get_fileext("abc")
+    ''
+    """
+    return os.path.splitext(filepath)[1][1:]
 
-    if file_and_ext[1]:  # ext, e.g. ".yaml"
-        ldr = loaders.get(file_and_ext[1][1:], False)
-        if ldr:
-            return ldr
 
-    return None
+def get_loader(filepath=None, filetype=None, loaders=LOADERS):
+    if filepath is None and filetype is None:
+        logging.error("Could not determine loader type")
+        return None
+
+    ext = filetype if filepath is None else get_fileext(filepath)
+    return loaders.get(ext, None)
 
 
-def load_context(filepath):
+def load_context(filepath, filetype=None):
     """Load context data from given file.
 
     :param filepath: Context data file path :: str
     """
-    loader = get_loader(filepath)
+    loader = get_loader(filepath, filetype)
     if loader is None:
         logging.warn("Could not get appropriate loader for " + loader)
         return {}
@@ -123,14 +131,14 @@ def load_context(filepath):
         return {}
 
 
-def load_contexts(paths):
+def load_contexts(pathspecs):
     """Load context data from given files.
 
     :param paths: Context data file path list :: [str]
     """
     d = {}
-    for path in paths:
-        diff = load_context(path)
+    for path, filetype in pathspecs:
+        diff = load_context(path, filetype)
         if diff:
             d.update(diff)
 
@@ -163,6 +171,40 @@ def render(filepath, context, template_paths=[]):
     return env.get_template(filename).render(**context)
 
 
+def parse_filespec(filespec, sep=":"):
+    """
+    >>> parse_filespec("base.json")
+    ('json', 'base.json')
+    >>> parse_filespec("yaml:foo.yaml")
+    ('yaml', 'foo.yaml')
+    >>> parse_filespec("yaml:foo.dat")
+    ('yaml', 'foo.dat')
+    """
+    if sep in filespec:
+        return tuple(filespec.split(sep))
+    else:
+        return (get_fileext(filespec), filespec)
+
+
+def flip(xy):
+    (x, y) = xy
+    return (y, x)
+
+
+def parse_filespecs(filespecs, sep=","):
+    """
+    >>> parse_filespecs("")
+    []
+    >>> parse_filespecs("base.json")
+    [('base.json', 'json')]
+    >>> parse_filespecs("base.json,foo.yaml")
+    [('base.json', 'json'), ('foo.yaml', 'yaml')]
+    >>> parse_filespecs("base.json,yaml:foo.dat")
+    [('base.json', 'json'), ('foo.dat', 'yaml')]
+    """
+    return [flip(parse_filespec(fs)) for fs in filespecs.split(sep) if fs]
+
+
 def option_parser():
     defaults = dict(
         template_paths=None,
@@ -176,10 +218,14 @@ def option_parser():
 
     p.add_option("-T", "--template-paths",
         help="Colon ':' separated template search paths [.]")
-    p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-C", "--contexts",
-        help="Colon ':' separated data file[s] to instantiate templates"
+        help="Specify file[s] (and its file type optionally) to provides "
+            " context data to instantiate templates. "
+            " The option argument's format is "
+            " [type:]<filename_or_path>[,[type:]<filename_or_path>,...], "
+            " ex. json:common.json,./specific.yaml,yaml:test.dat"
     )
+    p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
 
     return p
@@ -223,6 +269,10 @@ def main(argv):
         open(options.output, "w").write(result)
     else:
         sys.stdout.write(result)
+
+
+if __name__ == '__main__':
+    main(sys.argv)
 
 
 # vim:sw=4:ts=4:et:
