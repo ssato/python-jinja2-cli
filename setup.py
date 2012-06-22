@@ -9,7 +9,7 @@ curdir = os.getcwd()
 sys.path.append(curdir)
 
 PACKAGE = "python-jinja2-cui"
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 # daily snapshots:
 #VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")

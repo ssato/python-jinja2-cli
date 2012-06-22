@@ -6,7 +6,7 @@
 
 Name:           python-jinja2-cui
 Version:        @VERSION@
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        CUI frontend for Jinja2 template engine
 Group:          Development/Tools
 License:        BSD
@@ -48,6 +48,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jun 22 2012 Satoru SATOH <ssato@redhat.com> - 0.0.2-1
+- Fixed a typo in src/jinja2-cui causing it cannot run :X
+
 * Fri Jun 22 2012 Satoru SATOH <ssato@redhat.com> - 0.0.1-2
 - Added dependency to PyYAML
 
