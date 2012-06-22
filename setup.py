@@ -8,7 +8,7 @@ import sys
 curdir = os.getcwd()
 sys.path.append(curdir)
 
-PACKAGE = "pytnon-jinja2-cui"
+PACKAGE = "python-jinja2-cui"
 VERSION = "0.0.1"
 
 # daily snapshots:
