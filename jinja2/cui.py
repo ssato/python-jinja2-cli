@@ -42,46 +42,23 @@ import os.path
 import sys
 
 
-# Borrowed from https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py:
-class InvalidDataFormat(Exception):
-    pass
-
-
-class InvalidInputData(Exception):
-    pass
-
-
-class MalformedJSON(InvalidInputData):
-    pass
-
-
-class MalformedYAML(InvalidInputData):
-    pass
-
-
-# Data loaders.
-#   Key: file extension
-#   Value: (load_func, possible_exception, exception_on_error)
+# Data loaders: Key=file_extension, Value=load_func
 LOADERS = {}
 
 
 try:
     import json
-    LOADERS["json"] = LOADERS["jsn"] = (json.loads, ValueError, MalformedJSON)
+    LOADERS["json"] = LOADERS["jsn"] = json.loads
 except ImportError:
     try:
         import simplejson as json
-        LOADERS["json"] = LOADERS["jsn"] = (
-            json.loads, json.JSONDecodeError, MalformedJSON
-        )
+        LOADERS["json"] = LOADERS["jsn"] = json.loads
     except ImportError:
         sys.stderr.write("JSON support is disabled as module not found.\n")
 
 try:
     import yaml
-    LOADERS["yaml"] = LOADERS["yml"] = (
-        yaml.load, yaml.YAMLError, MalformedYAML
-    )
+    LOADERS["yaml"] = LOADERS["yml"] = yaml.load
 except ImportError:
     sys.stderr.write("YAML support is disabled as module not found.\n")
 
@@ -105,7 +82,12 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
         logging.error("Could not determine loader type")
         return None
 
-    ext = filetype if filepath is None else get_fileext(filepath)
+    if filepath is None or filetype is not None:
+        ext = filetype
+    else:
+        ext = get_fileext(filepath)
+
+    logging.info("ext=" + ext)
     return loaders.get(ext, None)
 
 
@@ -116,18 +98,16 @@ def load_context(filepath, filetype=None):
     """
     loader = get_loader(filepath, filetype)
     if loader is None:
-        logging.warn("Could not get appropriate loader for " + loader)
+        logging.warn("Couldn't get loader: path=%s, type=%s" % \
+            (filepath, filetype))
         return {}
 
-    (load_fun, possible_exception, exception_on_error) = loader
+    logging.info("Loader found: path=%s, type=%s" % (filepath, filetype))
     data = open(filepath).read()
     try:
-        return load_fun(data)
-
-    except possible_exception:
-        logging.warn(u"%s ..." % data[:50])
-        # or:
-        # raise exception_on_error(u"%s ..." % data[:50])
+        return loader(data)
+    except Exception, e:
+        logging.warn(str(e))
         return {}
 
 
@@ -244,16 +224,14 @@ def main(argv):
     if options.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    sep = ":"
-
     if options.contexts:
-        ctx = load_contexts(options.contexts.split(sep))
+        ctx = load_contexts(parse_filespecs(options.contexts))
     else:
         ctx = {}
 
     if options.template_paths:
         try:
-            paths = options.template_paths.split(sep)
+            paths = options.template_paths.split(":")
         except:
             sys.stderr.write(
                 u"Ignored as invalid form: '%s'\n" % options.template_paths
