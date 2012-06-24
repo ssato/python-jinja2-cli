@@ -4,3 +4,4 @@ include python-jinja2-cui.spec.in
 include setup.py
 recursive-include jinja2 *.py
 include src/*
+include tests/*
