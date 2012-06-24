@@ -2,7 +2,7 @@ A CUI frontend for python-jinja2 based on:
 
 * https://github.com/ssato/misc/blob/master/jinja2_template_render.py
 
-Also imported some ieas in:
+Also imported some ideas in:
 
 * https://github.com/mitsuhiko/jinja2/pull/129
   (https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py)
