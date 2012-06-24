@@ -36,6 +36,7 @@
 """
 import codecs
 import jinja2
+import locale
 import logging
 import optparse
 import os.path
@@ -44,6 +45,10 @@ import sys
 
 # Data loaders: Key=file_extension, Value=load_func
 LOADERS = {}
+
+__enc = locale.getdefaultlocale()[1]
+sys.stdout = codecs.getwriter(__enc)(sys.stdout)
+sys.stderr = codecs.getwriter(__enc)(sys.stderr)
 
 
 try:
@@ -54,17 +59,13 @@ except ImportError:
         import simplejson as json
         LOADERS["json"] = LOADERS["jsn"] = json.loads
     except ImportError:
-        sys.stderr.write("JSON support is disabled as module not found.\n")
+        sys.stderr.write(u"JSON support is disabled as module not found.\n")
 
 try:
     import yaml
     LOADERS["yaml"] = LOADERS["yml"] = yaml.load
 except ImportError:
-    sys.stderr.write("YAML support is disabled as module not found.\n")
-
-
-sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
-sys.stderr = codecs.getwriter('utf_8')(sys.stderr)
+    sys.stderr.write(u"YAML support is disabled as module not found.\n")
 
 
 def get_fileext(filepath):
@@ -87,7 +88,7 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
     else:
         ext = get_fileext(filepath)
 
-    logging.info("ext=" + ext)
+    logging.info("type=" + ext)
     return loaders.get(ext, None)
 
 
