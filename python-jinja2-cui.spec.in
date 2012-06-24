@@ -35,6 +35,9 @@ A CUI frontend for Jinja2 template engine.
 rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
+# Make egg-info not included in this package:
+rm -f $RPM_BUILD_ROOT%{python_sitelib}/python_jinja2_cui*.egg-info
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
