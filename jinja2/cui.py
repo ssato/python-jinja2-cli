@@ -46,9 +46,14 @@ import sys
 # Data loaders: Key=file_extension, Value=load_func
 LOADERS = {}
 
-__enc = locale.getdefaultlocale()[1]
-sys.stdout = codecs.getwriter(__enc)(sys.stdout)
-sys.stderr = codecs.getwriter(__enc)(sys.stderr)
+_ENCODING = locale.getdefaultlocale()[1]
+sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
+sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
+
+
+# Override the default implementation:
+def open(path, flag='r'):
+    return codecs.open(path, flag, _ENCODING)
 
 
 try:

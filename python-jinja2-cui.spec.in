@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jul  2 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3-1
+- Allow chars not in ASCII such as UTF-8 chars for example
+
 * Fri Jun 22 2012 Satoru SATOH <ssato@redhat.com> - 0.0.2-1
 - Fixed a typo in src/jinja2-cui causing it cannot run :X
 
