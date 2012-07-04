@@ -47,8 +47,11 @@ import sys
 LOADERS = {}
 
 _ENCODING = locale.getdefaultlocale()[1]
+
 sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
+
+EXIT_ON_WARNS = False
 
 
 # Override the default implementation:
@@ -104,8 +107,11 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
     """
     loader = get_loader(filepath, filetype)
     if loader is None:
-        logging.warn("Couldn't get loader: path=%s, type=%s" % \
-            (filepath, filetype))
+        m = "Couldn't get loader: path=%s, type=%s" % (filepath, filetype)
+        if EXIT_ON_WARNS:
+            logging.warn(m)
+        else:
+            raise RuntimeError(m)
         return {}
 
     logging.info("Loader found: path=%s, type=%s" % (filepath, filetype))
@@ -113,7 +119,10 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
     try:
         return loader(data)
     except Exception, e:
-        logging.warn(str(e))
+        if EXIT_ON_WARNS:
+            logging.warn(str(e))
+        else:
+            raise RuntimeError(str(e))
         return {}
 
 
@@ -217,11 +226,16 @@ def option_parser():
         help="Input and output encoding [%default]"
     )
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
+    p.add_option("-W", "--warn", action="store_true",
+        help="Exit on warnings if True such like -Werror optoin for gcc"
+    )
 
     return p
 
 
 def main(argv):
+    global EXIT_ON_WARNS  # FIXME.
+
     logging.getLogger().setLevel(logging.INFO)
 
     p = option_parser()
@@ -230,6 +244,9 @@ def main(argv):
     if not args:
         p.print_help()
         sys.exit(0)
+
+    if options.warn:
+        EXIT_ON_WARNS = True
 
     if options.debug:
         logging.getLogger().setLevel(logging.DEBUG)
