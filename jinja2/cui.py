@@ -52,8 +52,8 @@ sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
 
 
 # Override the default implementation:
-def open(path, flag='r'):
-    return codecs.open(path, flag, _ENCODING)
+def open(path, flag='r', enc=_ENCODING):
+    return codecs.open(path, flag, enc)
 
 
 try:
@@ -97,7 +97,7 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
     return loaders.get(ext, None)
 
 
-def load_context(filepath, filetype=None):
+def load_context(filepath, filetype=None, enc=_ENCODING):
     """Load context data from given file.
 
     :param filepath: Context data file path :: str
@@ -109,7 +109,7 @@ def load_context(filepath, filetype=None):
         return {}
 
     logging.info("Loader found: path=%s, type=%s" % (filepath, filetype))
-    data = open(filepath).read()
+    data = open(filepath, enc=enc).read()
     try:
         return loader(data)
     except Exception, e:
@@ -117,14 +117,14 @@ def load_context(filepath, filetype=None):
         return {}
 
 
-def load_contexts(pathspecs):
+def load_contexts(pathspecs, enc):
     """Load context data from given files.
 
     :param paths: Context data file path list :: [str]
     """
     d = {}
     for path, filetype in pathspecs:
-        diff = load_context(path, filetype)
+        diff = load_context(path, filetype, enc)
         if diff:
             d.update(diff)
 
@@ -197,6 +197,7 @@ def option_parser():
         output=None,
         contexts=[],
         debug=False,
+        encoding=_ENCODING,
     )
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
@@ -212,6 +213,9 @@ def option_parser():
             " ex. json:common.json,./specific.yaml,yaml:test.dat"
     )
     p.add_option("-o", "--output", help="Output filename [stdout]")
+    p.add_option("-E", "--encoding",
+        help="Input and output encoding [%default]"
+    )
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
 
     return p
@@ -231,7 +235,9 @@ def main(argv):
         logging.getLogger().setLevel(logging.DEBUG)
 
     if options.contexts:
-        ctx = load_contexts(parse_filespecs(options.contexts))
+        ctx = load_contexts(
+            parse_filespecs(options.contexts), options.encoding
+        )
     else:
         ctx = {}
 
@@ -250,9 +256,9 @@ def main(argv):
     result = render(tmpl, ctx, paths)
 
     if options.output:
-        open(options.output, "w").write(result)
+        open(options.output, "w", options.encoding).write(result)
     else:
-        sys.stdout.write(result)
+        codecs.getwriter(options.encoding)(sys.stdout).write(result)
 
 
 if __name__ == '__main__':
