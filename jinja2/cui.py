@@ -96,7 +96,6 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
     else:
         ext = get_fileext(filepath)
 
-    logging.info("type=" + ext)
     return loaders.get(ext, None)
 
 
@@ -114,7 +113,7 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
             raise RuntimeError(m)
         return {}
 
-    logging.info("Loader found: path=%s, type=%s" % (filepath, filetype))
+    logging.debug("Loader found: path=%s, type=%s" % (filepath, filetype))
     data = open(filepath, enc=enc).read()
     try:
         return loader(data)
