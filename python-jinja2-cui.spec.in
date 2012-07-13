@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 13 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.2-1
+- Implemented recursive configuration merges
+
 * Wed Jul  4 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.1-1
 - Added new options, --warn to exit on warns and --encoding to set I/O encoding
 
