@@ -25,7 +25,7 @@ class TestMyDict(unittest.TestCase):
 
     def test_createFromDict(self):
         self.assertTrue(isinstance(C.MyDict.createFromDict({}), C.MyDict))
-        
+
         md = C.MyDict.createFromDict({"a": {"b": 1}, "c": 2, "d": [3, 4]})
         self.assertTrue(isinstance(md, C.MyDict))
         self.assertTrue(isinstance(md["a"], C.MyDict))
