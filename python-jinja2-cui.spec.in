@@ -38,6 +38,9 @@ rm -rf $RPM_BUILD_ROOT
 # Make egg-info not included in this package:
 rm -f $RPM_BUILD_ROOT%{python_sitelib}/python_jinja2_cui*.egg-info
 
+# Make not conflicts w/ python-jinja2
+rm -f $RPM_BUILD_ROOT%{python_sitelib}/jinja2/__init__.py*
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
