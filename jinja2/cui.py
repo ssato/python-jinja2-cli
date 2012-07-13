@@ -76,6 +76,42 @@ except ImportError:
     sys.stderr.write(u"YAML support is disabled as module not found.\n")
 
 
+def is_dict(x):
+    return isinstance(x, (MyDict, dict))
+
+
+def is_iterable(x):
+    return isinstance(x, (list, tuple)) or getattr(x, "next", False)
+
+
+class MyDict(dict):
+
+    @classmethod
+    def createFromDict(cls, dic={}):
+        md = MyDict()
+
+        for k, v in dic.iteritems():
+            md[k] = cls.createFromDict(v) if is_dict(v) else v
+
+        return md
+
+    def update(self, other, merge_lists=False):
+        """Merge recursively.
+
+        @param merge_lists: Merge not only dicts but also lists,
+            e.g. [1, 2], [3, 4] ==> [1, 2, 3, 4]
+        """
+        if is_dict(other):
+            for k, v in other.iteritems():
+                if k in self and is_dict(v) and is_dict(self[k]):
+                    self[k].update(v, merge_lists)  # update recursively.
+                else:
+                    if merge_lists and is_iterable(v):
+                        self[k] = self[k] + list(v)  # append v :: list
+                    else:
+                        self[k] = v  # replace self[k] w/ v or set.
+
+
 def get_fileext(filepath):
     """
     >>> get_fileext("a.json")
@@ -104,6 +140,8 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
 
     :param filepath: Context data file path :: str
     """
+    default = MyDict.createFromDict()
+
     loader = get_loader(filepath, filetype)
     if loader is None:
         m = "Couldn't get loader: path=%s, type=%s" % (filepath, filetype)
@@ -111,18 +149,25 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
             logging.warn(m)
         else:
             raise RuntimeError(m)
-        return {}
+        return default
 
     logging.debug("Loader found: path=%s, type=%s" % (filepath, filetype))
     data = open(filepath, enc=enc).read()
     try:
-        return loader(data)
+        x = loader(data)
+        if not is_dict(x):
+            logging.warn("Top-level object is not a dict: " + filepath)
+            return default
+
+        return MyDict.createFromDict(x)
+
     except Exception, e:
         if EXIT_ON_WARNS:
             logging.warn(str(e))
         else:
             raise RuntimeError(str(e))
-        return {}
+
+        return default
 
 
 def load_contexts(pathspecs, enc):
@@ -130,7 +175,7 @@ def load_contexts(pathspecs, enc):
 
     :param paths: Context data file path list :: [str]
     """
-    d = {}
+    d = MyDict.createFromDict()
     for path, filetype in pathspecs:
         diff = load_context(path, filetype, enc)
         if diff:
