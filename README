@@ -17,10 +17,36 @@ License: Same as python-jinja2, that is, BSD3.
 Features
 ============
 
-a. supports multiple configuration files in YAML or JSON to set parameters w/
+A. supports multiple configuration files in YAML or JSON to set parameters w/
    -C|--contexts option, ex. -C a.yaml,b.yaml,c.json
 
-b. supports setting template search paths w/ -T|--template-paths. This is 
+   NOTE: when multi-config files specified in -C option, parameters in these
+   are synthesized in a configuration, that is, if the content of a.yaml is
+
+   a:
+     x: {'y': 1, 'z': 2}
+     n: "aaa"
+
+   and the content of b.yaml is
+
+   a:
+     x: {'y': 4, 'x': 0}
+     m: "mmm"
+     n: "bbb"
+
+   b: "bbb"
+
+   then -C a.yaml,b.yaml will provide
+
+   a:
+     x: {'x': 0, 'y': 4, 'z': 2}
+     m: "mmm"
+     n: "bbb"
+
+   b: "bbb"
+
+
+B. supports setting template search paths w/ -T|--template-paths. This is 
    useful when using 'include' directive in templates; ex. -T .:templates/
 
 
