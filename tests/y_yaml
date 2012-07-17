@@ -1,3 +1,6 @@
+title:
+  sub: CUI フロントエンドによる Jinja2 テンプレートの複数設定ファイルによる実体化のテスト
+
 users:
   - {url: "http://www.example.com", username: foo}
   - {url: "http://www.example.co.jp", username: bar}

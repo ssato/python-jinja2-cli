@@ -1,6 +1,7 @@
 {% extends "a.template" %}
 {% block body %}
-<title>{% block title %}{{ title }}{% endblock %}</title>
+<title>{% block title %}{{ title.main }}{% endblock %}</title>
+<h1>{{ title.sub }}</h1>
 <ul>
 {% for user in users %}
   <li><a href="{{ user.url }}">{{ user.username }}</a></li>
