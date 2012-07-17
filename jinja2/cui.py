@@ -184,7 +184,36 @@ def load_contexts(pathspecs, enc):
     return d
 
 
-def render(filepath, context, template_paths=[]):
+def uniq(xs):
+    """Remove duplicates in given list with its order kept.
+
+    >>> uniq([])
+    []
+    >>> uniq([1, 4, 5, 1, 2, 3, 5, 10])
+    [1, 4, 5, 2, 3, 10]
+    """
+    acc = xs[:1]
+    for x in xs[1:]:
+        if x not in acc:
+            acc += [x]
+
+    return acc
+
+
+def mk_template_paths(filepath, template_paths=[]):
+    """
+    :param filepath: (Base) filepath of template file
+    :param template_paths: Template search paths
+    """
+    if template_paths:
+        return uniq(template_paths)
+    else:
+        # default:
+        tmpldir = os.path.abspath(os.path.dirname(filepath))
+        return [tmpldir]
+
+
+def render(filepath, context, paths):
     """
     Compile and render template, and returns the result.
 
@@ -192,19 +221,9 @@ def render(filepath, context, template_paths=[]):
 
     :param filepath: (Base) filepath of template file
     :param context: Context dict needed to instantiate templates
-    :param template_paths: Template search paths
+    :param paths: Template search paths
     """
-    topdir = os.path.abspath(os.path.dirname(filepath))
     filename = os.path.basename(filepath)
-
-    paths = [topdir, os.curdir]
-
-    if template_paths:
-        paths += template_paths
-
-    paths = list(set(paths))  # uniq
-    logging.debug("Template search paths: " + str(paths))
-
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
 
     return env.get_template(filename).render(**context)
@@ -289,6 +308,8 @@ def main(argv):
         p.print_help()
         sys.exit(0)
 
+    tmpl = args[0]
+
     if options.warn:
         EXIT_ON_WARNS = True
 
@@ -300,20 +321,22 @@ def main(argv):
             parse_filespecs(options.contexts), options.encoding
         )
     else:
-        ctx = {}
+        ctx = MyDict.createFromDict()
 
     if options.template_paths:
         try:
-            paths = options.template_paths.split(":")
+            paths = mk_template_paths(tmpl, options.template_paths.split(":"))
+            assert paths
         except:
             sys.stderr.write(
                 u"Ignored as invalid form: '%s'\n" % options.template_paths
             )
-            paths = []
+            paths = mk_template_paths(tmpl, [])
     else:
-        paths = []
+        paths = mk_template_paths(tmpl, [])
 
-    tmpl = args[0]
+    logging.debug("Template search paths: " + str(paths))
+
     result = render(tmpl, ctx, paths)
 
     if options.output:
