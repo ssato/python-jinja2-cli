@@ -210,7 +210,7 @@ def mk_template_paths(filepath, template_paths=[]):
     else:
         # default:
         tmpldir = os.path.abspath(os.path.dirname(filepath))
-        return [tmpldir]
+        return [os.curdir, tmpldir]
 
 
 def render(filepath, context, paths):
@@ -276,7 +276,8 @@ def option_parser():
     p.set_defaults(**defaults)
 
     p.add_option("-T", "--template-paths",
-        help="Colon ':' separated template search paths [.]")
+        help="Colon ':' separated template search paths " + \
+            "[., dir in which given template file exists]")
     p.add_option("-C", "--contexts",
         help="Specify file[s] (and its file type optionally) to provides "
             " context data to instantiate templates. "
