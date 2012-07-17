@@ -1,3 +1,6 @@
+About
+============
+
 A CUI frontend for python-jinja2 based on:
 
 * https://github.com/ssato/misc/blob/master/jinja2_template_render.py
@@ -7,6 +10,17 @@ Also imported some ideas in:
 * https://github.com/mitsuhiko/jinja2/pull/129
   (https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py)
 
-
 Author: Satoru SATOH <ssato@redhat.com>
-License: Same as python-jinja2, that is, BSD.
+License: Same as python-jinja2, that is, BSD3.
+
+
+Features
+============
+
+a. supports multiple configuration files in YAML or JSON to set parameters w/
+   -C|--contexts option, ex. -C a.yaml,b.yaml,c.json
+
+b. supports setting template search paths w/ -T|--template-paths. This is 
+   useful when using 'include' directive in templates; ex. -T .:templates/
+
+
