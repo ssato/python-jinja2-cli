@@ -50,3 +50,7 @@ B. supports setting template search paths w/ -T|--template-paths. This is
    useful when using 'include' directive in templates; ex. -T .:templates/
 
 
+Examples
+==============================
+
+please try `make -C examples` and  see the results: "/tmp/jinja2-cui.examples.d/*.out"
