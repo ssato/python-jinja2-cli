@@ -1,0 +1,17 @@
+c:
+  c0:
+    c1: "c.c0.c1 in b.yaml"
+
+xs:
+  - y: {z: "x0.y.z in b.yaml"}
+  - y: {z: "x1.y.z in b.yaml"}
+  - y: {z: "x2.y.z in b.yaml"}
+  - y: {z: "x3.y.z in b.yaml"}
+  - y: {z: "x4.y.z in b.yaml"}
+  - y: {z: "x5.y.z in b.yaml"}
+  - y: {z: "x6.y.z in b.yaml"}
+  - y: {z: "x7.y.z in b.yaml"}
+  - y: {z: "x8.y.z in b.yaml"}
+  - y: {z: "x9.y.z in b.yaml"}
+
+bool_x: true
