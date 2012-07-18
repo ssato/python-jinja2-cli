@@ -342,7 +342,7 @@ def main(argv):
 
     result = render(tmpl, ctx, paths)
 
-    if options.output:
+    if options.output and not options.output == '-':
         open(options.output, "w", options.encoding).write(result)
     else:
         codecs.getwriter(options.encoding)(sys.stdout).write(result)
