@@ -54,8 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Jul 17 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.4-1
-- Changed default template search paths not to remove template dir
+* Wed Jul 18 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.5-1
+- Treat '-' as stdout output
+- Added some examples
 
 * Tue Jul 17 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.3-1
 - Changed default template search paths
