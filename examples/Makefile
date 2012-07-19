@@ -28,7 +28,7 @@ $(objs): $(WORKDIR)
 
 $(WORKDIR)/0_single_template_and_config.out: a.yaml
 $(WORKDIR)/0_single_template_and_config.out: a.t
-	@echo "case #0: single template and sing config"
+	@echo "case #0: single template and single config"
 	$(render) -C a.yaml $< -o $@
 
 $(WORKDIR)/1_single_template_and_multi_configs.out: a.yaml
