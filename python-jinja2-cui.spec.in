@@ -39,7 +39,7 @@ rm -rf $RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{python_sitelib}/python_jinja2_cui*.egg-info
 
 # Make not conflicts w/ python-jinja2
-rm -f $RPM_BUILD_ROOT%{python_sitelib}/jinja2/__init__.py*
+#rm -f $RPM_BUILD_ROOT%{python_sitelib}/jinja2/__init__.py*
 
 
 %clean
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jul 25 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.6-1
+- Moved module location
+
 * Wed Jul 18 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.5-1
 - Treat '-' as stdout output
 - Added some examples

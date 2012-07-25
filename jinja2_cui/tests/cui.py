@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2011, 2012 Satoru SATOH <satoru.satoh @ gmail.com>
 #
-import jinja2.cui as C
+import jinja2_cui.cui as C
 import unittest
 
 

@@ -9,7 +9,7 @@ curdir = os.getcwd()
 sys.path.append(curdir)
 
 PACKAGE = "python-jinja2-cui"
-VERSION = "0.0.3.5"
+VERSION = "0.0.3.6"
 
 # daily snapshots:
 #VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")
@@ -76,7 +76,7 @@ setup(name=PACKAGE,
     license="BSD",
     url="https://github.com/ssato/python-jinja2-cui",
     packages=[
-        "jinja2",
+        "jinja2_cui",
     ],
     scripts=glob.glob("src/*"),
     data_files=data_files,
