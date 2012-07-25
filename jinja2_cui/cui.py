@@ -243,6 +243,7 @@ def template_path(filepath, paths):
         if os.path.exists(candidate):
             return candidate
 
+    logging.warn("Could not find template=%s in paths=%s" % (filepath, paths))
     return None
 
 
@@ -263,9 +264,9 @@ def find_vars(filepath, paths):
             jinja2.meta.find_referenced_templates(ast) if f
     ]
 
-    def find_undecls_0(filepath):
+    def find_undecls_0(fpath):
         return jinja2.meta.find_undeclared_variables(
-            env.parse(open(filepath).read())
+            env.parse(open(fpath).read())
         )
 
     def find_undecls(filepaths):
