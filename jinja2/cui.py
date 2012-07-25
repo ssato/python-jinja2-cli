@@ -36,11 +36,14 @@
 """
 import codecs
 import jinja2
+import jinja2.meta
 import locale
 import logging
 import optparse
 import os.path
 import sys
+
+from functools import reduce as foldl
 
 
 # Data loaders: Key=file_extension, Value=load_func
@@ -226,6 +229,50 @@ def render(filepath, context, paths):
     filename = os.path.basename(filepath)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
     return env.get_template(filename).render(**context)
+
+
+def template_path(filepath, paths):
+    """
+    Return resolved path of given template file
+
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
+    """
+    for p in paths:
+        candidate = os.path.join(p, filepath)
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
+
+def find_vars(filepath, paths):
+    """
+    Find and return variables in given template.
+
+    see also: http://jinja.pocoo.org/docs/api/#the-meta-api
+
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
+    """
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
+    ast = env.parse(open(filepath).read())
+
+    templates = [
+        template_path(f, paths) for f in
+            jinja2.meta.find_referenced_templates(ast) if f
+    ]
+
+    def find_undecls_0(filepath):
+        return jinja2.meta.find_undeclared_variables(
+            env.parse(open(filepath).read())
+        )
+
+    def find_undecls(filepaths):
+        f = lambda s1, s2: list(set(list(s1) + list(s2)))
+        return foldl(f, [find_undecls_0(p) for p in filepaths], [])
+
+    return find_undecls([filepath] + templates)
 
 
 def parse_filespec(filespec, sep=":"):
