@@ -247,6 +247,34 @@ def template_path(filepath, paths):
     return None
 
 
+def find_refered_templates(filepath, paths, acc=[]):
+    """
+    Find and return templates referenced in given template recursively.
+
+    see also: http://jinja.pocoo.org/docs/api/#the-meta-api
+
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
+    """
+    if filepath is None or filepath in acc:
+        return acc
+
+    acc.append(filepath)  # add self
+
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
+    ast = env.parse(open(filepath).read())
+
+    for f in jinja2.meta.find_referenced_templates(ast):
+        if f and f not in acc:
+            acc.append(f)
+            xs = find_referenced_templates(f, paths, acc)
+            for x in xs:
+                if x not in acc:
+                    acc.append(x)
+
+    return acc
+
+
 def find_vars(filepath, paths):
     """
     Find and return variables in given template.
