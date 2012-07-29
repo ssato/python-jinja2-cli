@@ -247,35 +247,53 @@ def template_path(filepath, paths):
     return None
 
 
-def find_refered_templates(filepath, paths, acc=[]):
-    """
-    Find and return templates referenced in given template recursively.
+def get_ast(filepath, paths):
+    """Parse template (`filepath`) and return an abstract syntax tree.
 
     see also: http://jinja.pocoo.org/docs/api/#the-meta-api
 
     :param filepath: (Base) filepath of template file
     :param paths: Template search paths
     """
-    if filepath is None or filepath in acc:
-        return acc
-
-    acc.append(filepath)  # add self
-
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
-    ast = env.parse(open(filepath).read())
+    try:
+        return env.parse(open(filepath).read())
+    except:
+        return None
 
-    for f in jinja2.meta.find_referenced_templates(ast):
-        if f and f not in acc:
-            acc.append(f)
-            xs = find_referenced_templates(f, paths, acc)
-            for x in xs:
-                if x not in acc:
-                    acc.append(x)
+
+def find_templates(filepath, paths, acc=[]):
+    """
+    Find and return template paths including ones refered in given template
+    recursively.
+
+    :param filepath: Maybe base filepath of template file
+    :param paths: Template search paths
+    """
+    filepath = template_path(filepath, paths)
+    ast = get_ast(filepath, paths)
+
+    if ast:
+        if filepath not in acc:
+            acc.append(filepath)  # Add self.
+
+        ref_templates = [
+            template_path(f, paths) for f in
+                jinja2.meta.find_referenced_templates(ast) if f
+        ]
+
+        for f in ref_templates:
+            if f not in acc:
+                acc.append(f)
+
+            for t in find_templates(f, paths, acc):
+                if t not in acc:
+                    acc.append(t)
 
     return acc
 
 
-def find_vars(filepath, paths):
+def find_vars_0(filepath, paths):
     """
     Find and return variables in given template.
 
@@ -283,25 +301,25 @@ def find_vars(filepath, paths):
 
     :param filepath: (Base) filepath of template file
     :param paths: Template search paths
-    """
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
-    ast = env.parse(open(filepath).read())
 
-    templates = [
-        template_path(f, paths) for f in
-            jinja2.meta.find_referenced_templates(ast) if f
-    ]
+    :return:  [(template_abs_path, vars :: set)]
+    """
+    filepath = template_path(filepath, paths)
+    ast = get_ast(filepath, paths)
 
     def find_undecls_0(fpath):
-        return jinja2.meta.find_undeclared_variables(
-            env.parse(open(fpath).read())
-        )
+        ast_ = get_ast(fpath)
+        if ast_:
+            return jinja2.meta.find_undeclared_variables(ast_)
+        else:
+            return []
 
-    def find_undecls(filepaths):
-        f = lambda s1, s2: list(set(list(s1) + list(s2)))
-        return foldl(f, [find_undecls_0(p) for p in filepaths], [])
+    return [(f, find_undecls_0(f)) for f in find_templates(filepath, paths)]
 
-    return find_undecls([filepath] + templates)
+
+def find_vars(filepath, paths):
+    g = lambda s1, s2: s1.union(s2)
+    return foldl(g, (vs for vs in find_vars_0(filepath, paths)), set([]))
 
 
 def parse_filespec(filespec, sep=":"):
