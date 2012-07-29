@@ -44,6 +44,7 @@ import os.path
 import sys
 
 from functools import reduce as foldl
+from operator import concat
 
 
 # Data loaders: Key=file_extension, Value=load_func
@@ -307,10 +308,10 @@ def find_vars_0(filepath, paths):
     filepath = template_path(filepath, paths)
     ast = get_ast(filepath, paths)
 
-    def find_undecls_0(fpath):
-        ast_ = get_ast(fpath)
+    def find_undecls_0(fpath, paths=paths):
+        ast_ = get_ast(fpath, paths)
         if ast_:
-            return jinja2.meta.find_undeclared_variables(ast_)
+            return list(jinja2.meta.find_undeclared_variables(ast_))
         else:
             return []
 
@@ -318,8 +319,9 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    g = lambda s1, s2: s1.union(s2)
-    return foldl(g, (vs for vs in find_vars_0(filepath, paths)), set([]))
+    return list(set(
+        foldl(concat, (vs[1] for vs in find_vars_0(filepath, paths)), [])
+    ))
 
 
 def parse_filespec(filespec, sep=":"):
@@ -363,6 +365,7 @@ def option_parser():
         contexts=[],
         debug=False,
         encoding=_ENCODING,
+        vars=False,
     )
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
@@ -389,6 +392,8 @@ def option_parser():
     p.add_option("-W", "--warn", action="store_true",
         help="Exit on warnings if True such like -Werror optoin for gcc"
     )
+    p.add_option("-V", "--vars", action="store_true",
+        help="Dump vars in template[s] instead of render it")
 
     return p
 
@@ -433,6 +438,12 @@ def main(argv):
         paths = mk_template_paths(tmpl, [])
 
     logging.debug("Template search paths: " + str(paths))
+
+    if options.vars:
+        vars = list(find_vars(tmpl, paths))
+        for v in vars:
+            print v
+        sys.exit(0)
 
     result = render(tmpl, ctx, paths)
 
