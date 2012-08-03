@@ -383,8 +383,6 @@ def option_parser():
 
 
 def main(argv):
-    global EXIT_ON_WARNS  # FIXME.
-
     logging.getLogger().setLevel(logging.INFO)
 
     p = option_parser()
