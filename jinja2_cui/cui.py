@@ -55,8 +55,6 @@ _ENCODING = locale.getdefaultlocale()[1]
 sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
 
-EXIT_ON_WARNS = False
-
 
 # Override the default implementation:
 def open(path, flag='r', enc=_ENCODING):
@@ -139,20 +137,23 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
     return loaders.get(ext, None)
 
 
-def load_context(filepath, filetype=None, enc=_ENCODING):
+def load_context(filepath, filetype=None, enc=_ENCODING, werror=False):
     """Load context data from given file.
 
     :param filepath: Context data file path :: str
+    :param filetype: Forced context file type
+    :param enc: Character encoding of context file
+    :param werror: raise exception if any error occured like gcc's -Werr
     """
     default = MyDict.createFromDict()
 
     loader = get_loader(filepath, filetype)
     if loader is None:
         m = "Couldn't get loader: path=%s, type=%s" % (filepath, filetype)
-        if EXIT_ON_WARNS:
-            logging.warn(m)
-        else:
+        if werror:
             raise RuntimeError(m)
+
+        logging.warn(m)
         return default
 
     logging.debug("Loader found: path=%s, type=%s" % (filepath, filetype))
@@ -166,22 +167,21 @@ def load_context(filepath, filetype=None, enc=_ENCODING):
         return MyDict.createFromDict(x)
 
     except Exception, e:
-        if EXIT_ON_WARNS:
-            logging.warn(str(e))
-        else:
+        if werror:
             raise RuntimeError(str(e))
 
+        logging.warn(str(e))
         return default
 
 
-def load_contexts(pathspecs, enc):
+def load_contexts(pathspecs, enc, werror=False):
     """Load context data from given files.
 
     :param paths: Context data file path list :: [str]
     """
     d = MyDict.createFromDict()
     for path, filetype in pathspecs:
-        diff = load_context(path, filetype, enc)
+        diff = load_context(path, filetype, enc, werror)
         if diff:
             d.update(diff)
 
@@ -364,6 +364,7 @@ def option_parser():
         debug=False,
         encoding=_ENCODING,
         vars=False,
+        werror=False,
     )
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
@@ -387,7 +388,7 @@ def option_parser():
         help="Input and output encoding [%default]"
     )
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
-    p.add_option("-W", "--warn", action="store_true",
+    p.add_option("-W", "--werror", action="store_true",
         help="Exit on warnings if True such like -Werror optoin for gcc"
     )
     p.add_option("-V", "--vars", action="store_true",
@@ -410,15 +411,14 @@ def main(argv):
 
     tmpl = args[0]
 
-    if options.warn:
-        EXIT_ON_WARNS = True
-
     if options.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
     if options.contexts:
         ctx = load_contexts(
-            parse_filespecs(options.contexts), options.encoding
+            parse_filespecs(options.contexts),
+            options.encoding,
+            options.werror,
         )
     else:
         ctx = MyDict.createFromDict()
