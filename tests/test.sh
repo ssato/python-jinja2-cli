@@ -1,1 +1,1 @@
-python ../jinja2/cui.py -T . -C x.yaml,yaml:y_yaml -o /tmp/test.out -D b.template
+python ../jinja2_cui/cui.py -T . -C x.yaml -C yaml:y_yaml -o /tmp/test.out -D b.template

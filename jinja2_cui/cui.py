@@ -341,25 +341,11 @@ def flip(xy):
     return (y, x)
 
 
-def parse_filespecs(filespecs, sep=","):
-    """
-    >>> parse_filespecs("")
-    []
-    >>> parse_filespecs("base.json")
-    [('base.json', 'json')]
-    >>> parse_filespecs("base.json,foo.yaml")
-    [('base.json', 'json'), ('foo.yaml', 'yaml')]
-    >>> parse_filespecs("base.json,yaml:foo.dat")
-    [('base.json', 'json'), ('foo.dat', 'yaml')]
-    """
-    return [flip(parse_filespec(fs)) for fs in filespecs.split(sep) if fs]
-
-
 def option_parser():
     defaults = dict(
         template_paths=None,
         output=None,
-        contexts=[],
+        context=[],
         debug=False,
         encoding=_ENCODING,
         vars=False,
@@ -375,12 +361,12 @@ def option_parser():
             "is always included in the search paths (at the end of " + \
             "the path list) regardless of this option. " + \
             "[., dir in which given template file exists]")
-    p.add_option("-C", "--contexts",
-        help="Specify file[s] (and its file type optionally) to provides "
+    p.add_option("-C", "--context", action="append",
+        help="Specify file and optionally its file type to provides "
             " context data to instantiate templates. "
             " The option argument's format is "
-            " [type:]<filename_or_path>[,[type:]<filename_or_path>,...], "
-            " ex. json:common.json,./specific.yaml,yaml:test.dat"
+            " [type:]<filename_or_path>"
+            " ex. -C json:common.json -C ./specific.yaml -C yaml:test.dat"
     )
     p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-E", "--encoding",
@@ -413,9 +399,9 @@ def main(argv):
     if options.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    if options.contexts:
+    if options.context:
         ctx = load_contexts(
-            parse_filespecs(options.contexts),
+            [flip(parse_filespec(f)) for f in options.context],
             options.encoding,
             options.werror,
         )
