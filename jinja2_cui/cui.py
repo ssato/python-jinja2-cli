@@ -52,7 +52,6 @@ LOADERS = {}
 
 _ENCODING = locale.getdefaultlocale()[1]
 
-sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
 
 
