@@ -287,9 +287,7 @@ def find_templates(filepath, paths, acc=[]):
             if f not in acc:
                 acc.append(f)
 
-            for t in find_templates(f, paths, acc):
-                if t not in acc:
-                    acc.append(t)
+            acc += [t for t in find_templates(f, paths, acc) if t not in acc]
 
     return acc
 
@@ -303,7 +301,7 @@ def find_vars_0(filepath, paths):
     :param filepath: (Base) filepath of template file
     :param paths: Template search paths
 
-    :return:  [(template_abs_path, vars :: set)]
+    :return:  [(template_abs_path, [var])]
     """
     filepath = template_path(filepath, paths)
     ast = get_ast(filepath, paths)
@@ -319,9 +317,9 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    return list(set(
+    return uniq(
         foldl(concat, (vs[1] for vs in find_vars_0(filepath, paths)), [])
-    ))
+    )
 
 
 def parse_filespec(filespec, sep=":"):
