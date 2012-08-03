@@ -97,9 +97,9 @@ class MyDict(dict):
         return md
 
     def update(self, other, merge_lists=False):
-        """Merge recursively.
+        """Merge `self` and `other` recursively.
 
-        @param merge_lists: Merge not only dicts but also lists,
+        :param merge_lists: Merge not only dicts but also lists,
             e.g. [1, 2], [3, 4] ==> [1, 2, 3, 4]
         """
         if is_dict(other):
@@ -137,12 +137,12 @@ def get_loader(filepath=None, filetype=None, loaders=LOADERS):
 
 
 def load_context(filepath, filetype=None, enc=_ENCODING, werror=False):
-    """Load context data from given file.
+    """Load context data from given file at `filepath`.
 
-    @param filepath: Context data file path :: str
-    @param filetype: Forced context file type
-    @param enc: Character encoding of context file
-    @param werror: raise exception if any error occured like gcc's -Werr
+    :param filepath: Context data file path :: str
+    :param filetype: Forced context file type
+    :param enc: Character encoding of context file
+    :param werror: raise exception if any error occured like gcc's -Werr
     """
     default = MyDict.createFromDict()
 
@@ -176,7 +176,7 @@ def load_context(filepath, filetype=None, enc=_ENCODING, werror=False):
 def load_contexts(pathspecs, enc, werror=False):
     """Load context data from given files.
 
-    @param paths: Context data file path list :: [str]
+    :param paths: Context data file path list :: [str]
     """
     d = MyDict.createFromDict()
     for path, filetype in pathspecs:
@@ -205,8 +205,8 @@ def uniq(xs):
 
 def mk_template_paths(filepath, template_paths=[]):
     """
-    @param filepath: (Base) filepath of template file
-    @param template_paths: Template search paths
+    :param filepath: (Base) filepath of template file
+    :param template_paths: Template search paths
     """
     tmpldir = os.path.abspath(os.path.dirname(filepath))
     if template_paths:
@@ -222,9 +222,9 @@ def render(filepath, context, paths):
 
     see also: http://jinja.pocoo.org/docs/api/#basics
 
-    @param filepath: (Base) filepath of template file
-    @param context: Context dict needed to instantiate templates
-    @param paths: Template search paths
+    :param filepath: (Base) filepath of template file
+    :param context: Context dict needed to instantiate templates
+    :param paths: Template search paths
     """
     filename = os.path.basename(filepath)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
@@ -235,8 +235,8 @@ def template_path(filepath, paths):
     """
     Return resolved path of given template file
 
-    @param filepath: (Base) filepath of template file
-    @param paths: Template search paths
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
     """
     for p in paths:
         candidate = os.path.join(p, filepath)
@@ -252,8 +252,8 @@ def get_ast(filepath, paths):
 
     see also: http://jinja.pocoo.org/docs/api/#the-meta-api
 
-    @param filepath: (Base) filepath of template file
-    @param paths: Template search paths
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
     """
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
     try:
@@ -267,8 +267,8 @@ def find_templates(filepath, paths, acc=[]):
     Find and return template paths including ones refered in given template
     recursively.
 
-    @param filepath: Maybe base filepath of template file
-    @param paths: Template search paths
+    :param filepath: Maybe base filepath of template file
+    :param paths: Template search paths
     """
     filepath = template_path(filepath, paths)
     ast = get_ast(filepath, paths)
@@ -297,10 +297,10 @@ def find_vars_0(filepath, paths):
 
     see also: http://jinja.pocoo.org/docs/api/#the-meta-api
 
-    @param filepath: (Base) filepath of template file
-    @param paths: Template search paths
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
 
-    @return:  [(template_abs_path, [var])]
+    :return:  [(template_abs_path, [var])]
     """
     filepath = template_path(filepath, paths)
     ast = get_ast(filepath, paths)
