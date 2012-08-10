@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Aug 10 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.7-1
+- Changed contexts option behavior
+
 * Wed Jul 25 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.6-1
 - Moved module location
 
