@@ -44,12 +44,12 @@ import os.path
 import sys
 
 from functools import reduce as foldl
+from logging import DEBUG, INFO
 from operator import concat
 
 
 # Data loaders: Key=file_extension, Value=load_func
-LOADERS = {}
-
+_LOADERS = {}
 _ENCODING = locale.getdefaultlocale()[1]
 
 sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
@@ -62,17 +62,17 @@ def open(path, flag='r', enc=_ENCODING):
 
 try:
     import json
-    LOADERS["json"] = LOADERS["jsn"] = json.loads
+    _LOADERS["json"] = _LOADERS["jsn"] = json.loads
 except ImportError:
     try:
         import simplejson as json
-        LOADERS["json"] = LOADERS["jsn"] = json.loads
+        _LOADERS["json"] = _LOADERS["jsn"] = json.loads
     except ImportError:
         sys.stderr.write(u"JSON support is disabled as module not found.\n")
 
 try:
     import yaml
-    LOADERS["yaml"] = LOADERS["yml"] = yaml.load
+    _LOADERS["yaml"] = _LOADERS["yml"] = yaml.load
 except ImportError:
     sys.stderr.write(u"YAML support is disabled as module not found.\n")
 
@@ -123,7 +123,7 @@ def get_fileext(filepath):
     return os.path.splitext(filepath)[1][1:]
 
 
-def get_loader(filepath=None, filetype=None, loaders=LOADERS):
+def get_loader(filepath=None, filetype=None, loaders=_LOADERS):
     if filepath is None and filetype is None:
         logging.error("Could not determine loader type")
         return None
@@ -341,11 +341,50 @@ def flip(xy):
     return (y, x)
 
 
+def parse_and_load_contexts(contexts, enc, werr):
+    """
+    :param contexts: list of context file paths
+    :param enc: Input encoding of context files
+    :param werr: Exit immediately if True and any errors occurrs
+        while loading context files
+    """
+    if contexts:
+        ctx = load_contexts(
+            [flip(parse_filespec(f)) for f in contexts], enc, werr
+        )
+    else:
+        ctx = MyDict.createFromDict()
+
+    return ctx
+
+
+def parse_template_paths(tmpl, paths, sep=":"):
+    """
+    Parse template_paths option string and return [template_path].
+
+    :param tmpl: Template file to render
+    :param paths: str to specify template path list separated by `sep`
+    :param sep: template path list separator
+    """
+    if paths:
+        try:
+            paths = mk_template_paths(tmpl, paths.split(sep))
+            assert paths
+        except:
+            sys.stderr.write(u"Ignored as invalid form: '%s'\n" % paths)
+            paths = mk_template_paths(tmpl, [])
+    else:
+        paths = mk_template_paths(tmpl, [])
+
+    logging.debug("Template search paths: " + str(paths))
+    return paths
+
+
 def option_parser():
     defaults = dict(
         template_paths=None,
         output=None,
-        context=[],
+        contexts=[],
         debug=False,
         encoding=_ENCODING,
         vars=False,
@@ -361,7 +400,7 @@ def option_parser():
             "is always included in the search paths (at the end of " + \
             "the path list) regardless of this option. " + \
             "[., dir in which given template file exists]")
-    p.add_option("-C", "--context", action="append",
+    p.add_option("-C", "--contexts", action="append",
         help="Specify file and optionally its file type to provides "
             " context data to instantiate templates. "
             " The option argument's format is "
@@ -383,8 +422,6 @@ def option_parser():
 
 
 def main(argv):
-    logging.getLogger().setLevel(logging.INFO)
-
     p = option_parser()
     (options, args) = p.parse_args(argv[1:])
 
@@ -392,33 +429,13 @@ def main(argv):
         p.print_help()
         sys.exit(0)
 
+    logging.getLogger().setLevel(DEBUG if options.debug else INFO)
+
     tmpl = args[0]
-
-    if options.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
-
-    if options.context:
-        ctx = load_contexts(
-            [flip(parse_filespec(f)) for f in options.context],
-            options.encoding,
-            options.werror,
-        )
-    else:
-        ctx = MyDict.createFromDict()
-
-    if options.template_paths:
-        try:
-            paths = mk_template_paths(tmpl, options.template_paths.split(":"))
-            assert paths
-        except:
-            sys.stderr.write(
-                u"Ignored as invalid form: '%s'\n" % options.template_paths
-            )
-            paths = mk_template_paths(tmpl, [])
-    else:
-        paths = mk_template_paths(tmpl, [])
-
-    logging.debug("Template search paths: " + str(paths))
+    ctx = parse_and_load_contexts(
+        options.contexts, options.encoding, options.werror
+    )
+    paths = parse_template_paths(tmpl, options.template_paths)
 
     if options.vars:
         vars = list(find_vars(tmpl, paths))
@@ -436,6 +453,5 @@ def main(argv):
 
 if __name__ == '__main__':
     main(sys.argv)
-
 
 # vim:sw=4:ts=4:et:
