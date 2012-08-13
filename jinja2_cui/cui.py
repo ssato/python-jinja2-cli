@@ -41,6 +41,7 @@ import locale
 import logging
 import optparse
 import os.path
+import os
 import sys
 
 from functools import reduce as foldl
@@ -446,6 +447,10 @@ def main(argv):
     result = render(tmpl, ctx, paths)
 
     if options.output and not options.output == '-':
+        outdir = os.path.dirname(options.output)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
         open(options.output, "w", options.encoding).write(result)
     else:
         codecs.getwriter(options.encoding)(sys.stdout).write(result)
