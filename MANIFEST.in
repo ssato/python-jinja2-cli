@@ -5,4 +5,5 @@ include setup.py
 recursive-include jinja2_cui *.py
 include src/*
 include tests/*
+include tests/conf.d/*
 include examples/*

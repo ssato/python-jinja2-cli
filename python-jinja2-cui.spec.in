@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Aug 30 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.8-1
+- Allow glob patterns in filespecs in --context option
+
 * Fri Aug 10 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.7-1
 - Changed contexts option behavior
 
