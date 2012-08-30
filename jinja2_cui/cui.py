@@ -35,6 +35,8 @@
  References: http://jinja.pocoo.org
 """
 import codecs
+import glob
+import itertools
 import jinja2
 import jinja2.meta
 import locale
@@ -46,7 +48,18 @@ import sys
 
 from functools import reduce as foldl
 from logging import DEBUG, INFO
-from operator import concat
+from operator import concat as listplus
+
+try:
+    chain_from_iterable = itertools.chain.from_iterable
+except AttributeError:
+    # Borrowed from library doc, 9.7.1 Itertools functions:
+    def _from_iterable(iterables):
+        for it in iterables:
+            for element in it:
+                yield element
+
+    chain_from_iterable = _from_iterable
 
 
 # Data loaders: Key=file_extension, Value=load_func
@@ -318,23 +331,8 @@ def find_vars_0(filepath, paths):
 
 def find_vars(filepath, paths):
     return uniq(
-        foldl(concat, (vs[1] for vs in find_vars_0(filepath, paths)), [])
+        foldl(listplus, (vs[1] for vs in find_vars_0(filepath, paths)), [])
     )
-
-
-def parse_filespec(filespec, sep=":"):
-    """
-    >>> parse_filespec("base.json")
-    ('json', 'base.json')
-    >>> parse_filespec("yaml:foo.yaml")
-    ('yaml', 'foo.yaml')
-    >>> parse_filespec("yaml:foo.dat")
-    ('yaml', 'foo.dat')
-    """
-    if sep in filespec:
-        return tuple(filespec.split(sep))
-    else:
-        return (get_fileext(filespec), filespec)
 
 
 def flip(xy):
@@ -342,16 +340,68 @@ def flip(xy):
     return (y, x)
 
 
+def concat(xss):
+    """
+    >>> concat([[]])
+    []
+    >>> concat((()))
+    []
+    >>> concat([[1,2,3],[4,5]])
+    [1, 2, 3, 4, 5]
+    >>> concat([[1,2,3],[4,5,[6,7]]])
+    [1, 2, 3, 4, 5, [6, 7]]
+    >>> concat(((1,2,3),(4,5,[6,7])))
+    [1, 2, 3, 4, 5, [6, 7]]
+    >>> concat(((1,2,3),(4,5,[6,7])))
+    [1, 2, 3, 4, 5, [6, 7]]
+    >>> concat((i, i*2) for i in range(3))
+    [0, 0, 1, 2, 2, 4]
+    """
+    return list(chain_from_iterable(xs for xs in xss))
+
+
+# TODO:
+#def __is_glob(s, gpat='*'):
+#    return gpat in s and ...
+
+
+def parse_filespec(fspec, sep=':', gpat='*'):
+    """
+    Parse given filespec `fspec` and return [(filetype, filepath)].
+
+    :param fspec: filespec
+    :param sep: a char separating filetype and filepath in filespec
+    :param gpat: a char for glob pattern
+
+    >>> parse_filespec("base.json")
+    [('base.json', 'json')]
+    >>> parse_filespec("yaml:foo.yaml")
+    [('foo.yaml', 'yaml')]
+    >>> parse_filespec("yaml:foo.dat")
+    [('foo.dat', 'yaml')]
+
+    # FIXME: How to test it?
+    # >>> parse_filespec("yaml:bar/*.conf")
+    # [('bar/a.conf', 'yaml'), ('bar/b.conf', 'yaml')]
+
+    TODO: Allow '*' (glob pattern) in filepath when escaped with '\\', etc.
+    """
+    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else \
+        (get_fileext(fspec), fspec)
+
+    return [(fs, ft) for fs in glob.glob(fp)] if gpat in fspec else [flip(tp)]
+
+
 def parse_and_load_contexts(contexts, enc, werr):
     """
-    :param contexts: list of context file paths
+    :param contexts: list of context file specs
     :param enc: Input encoding of context files
     :param werr: Exit immediately if True and any errors occurrs
         while loading context files
     """
     if contexts:
         ctx = load_contexts(
-            [flip(parse_filespec(f)) for f in contexts], enc, werr
+            concat(parse_filespec(f) for f in contexts), enc, werr
         )
     else:
         ctx = MyDict.createFromDict()
@@ -402,11 +452,12 @@ def option_parser():
             "the path list) regardless of this option. " + \
             "[., dir in which given template file exists]")
     p.add_option("-C", "--contexts", action="append",
-        help="Specify file and optionally its file type to provides "
+        help="Specify file path and optionally its filetype, to provides "
             " context data to instantiate templates. "
             " The option argument's format is "
-            " [type:]<filename_or_path>"
-            " ex. -C json:common.json -C ./specific.yaml -C yaml:test.dat"
+            " [type:]<file_name_or_path_or_glob_pattern>"
+            " ex. -C json:common.json -C ./specific.yaml -C yaml:test.dat, "
+            "     -C yaml:/etc/foo.d/*.conf"
     )
     p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-E", "--encoding",
