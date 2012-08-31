@@ -66,7 +66,7 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    return uniq(
+    return R.uniq(
         foldl(listplus, (vs[1] for vs in find_vars_0(filepath, paths)), [])
     )
 
@@ -108,8 +108,8 @@ def main(argv):
     tmpl = args[0]
     paths = R.parse_template_paths(tmpl, options.template_paths)
 
-    vars = '\n'.join(find_vars(tmpl, paths))
-    write_to_output(options.output, options.encoding, vars)
+    vars = '\n'.join(find_vars(tmpl, paths)) + '\n'
+    R.write_to_output(options.output, options.encoding, vars)
 
 
 if __name__ == '__main__':
