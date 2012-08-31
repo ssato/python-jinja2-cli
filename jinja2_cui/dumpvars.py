@@ -30,7 +30,7 @@
  Requirements: python-jinja2, python-simplejson (if python < 2.6) and PyYAML
  References: http://jinja.pocoo.org
 """
-import jinja2_cui.renderer as R
+import jinja2_cui.render as R
 import jinja2.meta
 import logging
 import optparse
