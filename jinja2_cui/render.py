@@ -30,9 +30,9 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
  Requirements: python-jinja2, python-simplejson (if python < 2.6) and PyYAML
- References: http://jinja.pocoo.org
+ References: http://jinja.pocoo.org,
+    especially http://jinja.pocoo.org/docs/api/#basics
 """
 import codecs
 import glob
@@ -228,19 +228,43 @@ def mk_template_paths(filepath, template_paths=[]):
         return [os.curdir, tmpldir]
 
 
-def render(filepath, context, paths):
+def tmpl_env(paths):
     """
-    Compile and render template, and returns the result.
-
-    see also: http://jinja.pocoo.org/docs/api/#basics
-
-    :param filepath: (Base) filepath of template file
-    :param context: Context dict needed to instantiate templates
     :param paths: Template search paths
     """
-    filename = os.path.basename(filepath)
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
-    return env.get_template(filename).render(**context)
+    return jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
+
+
+def render_s(tmpl_s, ctx, paths=[os.curdir]):
+    """
+    Compile and render given template string `tmpl_s` with context `context`.
+
+    :param tmpl_s: Template string
+    :param ctx: Context dict needed to instantiate templates
+    :param paths: Template search paths
+
+    >>> render_s('a = {{ a }}, b = "{{ b }}"', {'a': 1, 'b': 'bbb'})
+    'a = 1, b = "bbb"'
+    """
+    return tmpl_env(paths).from_string(tmpl_s).render(**ctx)
+
+
+def render(filepath, ctx, paths):
+    """
+    Compile and render template, and return the result.
+
+    Similar to the above but template is given as a file path `filepath` or
+    sys.stdin if `filepath` is '-'.
+
+    :param filepath: (Base) filepath of template file or '-' (stdin)
+    :param ctx: Context dict needed to instantiate templates
+    :param paths: Template search paths
+    """
+    if filepath == '-':
+        return render_s(sys.stdin.read(), ctx, paths)
+    else:
+        env = tmpl_env(paths)
+        return env.get_template(os.path.basename(filepath)).render(**ctx)
 
 
 def template_path(filepath, paths):
