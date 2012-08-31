@@ -36,10 +36,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
 # Make egg-info not included in this package:
-rm -f $RPM_BUILD_ROOT%{python_sitelib}/python_jinja2_cui*.egg-info
-
-# Make not conflicts w/ python-jinja2
-#rm -f $RPM_BUILD_ROOT%{python_sitelib}/jinja2/__init__.py*
+rm -f $RPM_BUILD_ROOT%{python_sitelib}/*.egg-info
 
 
 %clean
@@ -54,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Aug 31 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.9-1
+- Split tools
+
 * Thu Aug 30 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.8-1
 - Allow glob patterns in filespecs in --context option
 

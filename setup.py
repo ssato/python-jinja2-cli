@@ -9,7 +9,7 @@ curdir = os.getcwd()
 sys.path.append(curdir)
 
 PACKAGE = "python-jinja2-cui"
-VERSION = "0.0.3.8"
+VERSION = "0.0.3.9"
 
 # daily snapshots:
 #VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")
@@ -85,6 +85,5 @@ setup(name=PACKAGE,
         "rpm":  RpmCommand,
     },
 )
-
 
 # vim:sw=4:ts=4:et:
