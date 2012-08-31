@@ -1,7 +1,7 @@
 #! /usr/bin/python
-import jinja2_cui.cui
+import jinja2_cui.render
 import sys
 
-jinja2_cui.cui.main(sys.argv)
+jinja2_cui.render.main(sys.argv)
 
 # vim:sw=4:ts=4:et:
