@@ -1,0 +1,38 @@
+#! /usr/bin/python
+import jinja2_cui.render as R
+import jinja2_cui.dumpvars as D
+
+from sys import argv
+
+
+# default is 'render' command:
+cmds = [("r", "render", R.main), ("d", "dumpvars", D.main)]
+
+
+def cmd2prog(c):
+    return "jinja2-cui " + c
+
+
+def usage():
+    cs = ", ".join(c for _a, c, _f in cmds)
+    cas = ", ".join(a for a, _c, _f in cmds)
+    print """Usage: %s COMMAND_OR_COMMAND_ABBREV [Options] [Arg ...]
+
+Commands: %s
+Command abbreviations: %s
+""" % (argv[0], cs, cas)
+
+
+if len(argv) == 1 or argv[1] in ("-h", "--help"):
+    usage()
+else:
+    cfs = [(c, f) for abbrev, c, f in cmds if argv[1].startswith(abbrev)]
+    if cfs:
+        (c, f) = cfs[0]
+        f([cmd2prog(c)] + argv[2:])
+    else:
+        (c, f) = cmds[0][1:]
+        f([cmd2prog(c)] + argv[1:])  # keep backward compatiblity.
+
+
+# vim:sw=4:ts=4:et:

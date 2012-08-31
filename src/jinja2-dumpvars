@@ -1,7 +1,0 @@
-#! /usr/bin/python
-import jinja2_cui.dumpvars
-import sys
-
-jinja2_cui.dumpvars.main(sys.argv)
-
-# vim:sw=4:ts=4:et:
