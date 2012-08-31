@@ -399,13 +399,15 @@ def parse_template_paths(tmpl, paths, sep=":"):
     return paths
 
 
-def option_parser():
+def option_parser(argv=sys.argv):
     defaults = dict(
         template_paths=None, output=None, contexts=[], debug=False,
         encoding=_ENCODING, werror=False,
     )
 
-    p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
+    p = optparse.OptionParser(
+        "%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0],
+    )
     p.set_defaults(**defaults)
 
     p.add_option("-T", "--template-paths",
@@ -444,7 +446,7 @@ def write_to_output(output=None, encoding="utf-8", content=""):
 
 
 def main(argv):
-    p = option_parser()
+    p = option_parser(argv)
     (options, args) = p.parse_args(argv[1:])
 
     if not args:

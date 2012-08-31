@@ -71,14 +71,16 @@ def find_vars(filepath, paths):
     )
 
 
-def option_parser(defaults=None):
+def option_parser(argv=sys.argv, defaults=None):
     if defaults is None:
         defaults = dict(
             template_paths=None, output=None, debug=False,
             encoding=R._ENCODING,
         )
 
-    p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
+    p = optparse.OptionParser(
+        "%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0],
+    )
     p.set_defaults(**defaults)
 
     p.add_option("-T", "--template-paths",
@@ -96,7 +98,7 @@ def option_parser(defaults=None):
 
 
 def main(argv):
-    p = option_parser()
+    p = option_parser(argv)
     (options, args) = p.parse_args(argv[1:])
 
     if not args:
