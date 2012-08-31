@@ -291,9 +291,8 @@ def get_ast(filepath, paths):
     :param filepath: (Base) filepath of template file
     :param paths: Template search paths
     """
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(paths))
     try:
-        return env.parse(open(filepath).read())
+        return tmpl_env(paths).parse(open(filepath).read())
     except:
         return None
 
