@@ -51,11 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Fri Aug 31 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.9-1
-- Split tools
-
-* Thu Aug 30 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.8-1
+* Fri Aug 31 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.8-1
 - Allow glob patterns in filespecs in --context option
+- Splited tools and modules, render and dumpvars
 
 * Fri Aug 10 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.7-1
 - Changed contexts option behavior
