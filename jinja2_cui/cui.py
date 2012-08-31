@@ -31,7 +31,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
- Requirements: python-jinja2, python-simplejson (python < 2.6) and PyYAML
+ Requirements: python-jinja2, python-simplejson (if python < 2.6) and PyYAML
  References: http://jinja.pocoo.org
 """
 import codecs
@@ -46,9 +46,7 @@ import os.path
 import os
 import sys
 
-from functools import reduce as foldl
 from logging import DEBUG, INFO
-from operator import concat as listplus
 
 try:
     chain_from_iterable = itertools.chain.from_iterable
@@ -305,36 +303,6 @@ def find_templates(filepath, paths, acc=[]):
     return acc
 
 
-def find_vars_0(filepath, paths):
-    """
-    Find and return variables in given template.
-
-    see also: http://jinja.pocoo.org/docs/api/#the-meta-api
-
-    :param filepath: (Base) filepath of template file
-    :param paths: Template search paths
-
-    :return:  [(template_abs_path, [var])]
-    """
-    filepath = template_path(filepath, paths)
-    ast = get_ast(filepath, paths)
-
-    def find_undecls_0(fpath, paths=paths):
-        ast_ = get_ast(fpath, paths)
-        if ast_:
-            return list(jinja2.meta.find_undeclared_variables(ast_))
-        else:
-            return []
-
-    return [(f, find_undecls_0(f)) for f in find_templates(filepath, paths)]
-
-
-def find_vars(filepath, paths):
-    return uniq(
-        foldl(listplus, (vs[1] for vs in find_vars_0(filepath, paths)), [])
-    )
-
-
 def flip(xy):
     (x, y) = xy
     return (y, x)
@@ -433,13 +401,8 @@ def parse_template_paths(tmpl, paths, sep=":"):
 
 def option_parser():
     defaults = dict(
-        template_paths=None,
-        output=None,
-        contexts=[],
-        debug=False,
-        encoding=_ENCODING,
-        vars=False,
-        werror=False,
+        template_paths=None, output=None, contexts=[], debug=False,
+        encoding=_ENCODING, werror=False,
     )
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE")
@@ -460,17 +423,24 @@ def option_parser():
             "     -C yaml:/etc/foo.d/*.conf"
     )
     p.add_option("-o", "--output", help="Output filename [stdout]")
-    p.add_option("-E", "--encoding",
-        help="Input and output encoding [%default]"
-    )
+    p.add_option("-E", "--encoding", help="I/O encoding [%default]")
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
     p.add_option("-W", "--werror", action="store_true",
         help="Exit on warnings if True such like -Werror optoin for gcc"
     )
-    p.add_option("-V", "--vars", action="store_true",
-        help="Dump vars in template[s] instead of render it")
 
     return p
+
+
+def write_to_output(output=None, encoding="utf-8", content=""):
+    if output and not output == '-':
+        outdir = os.path.dirname(output)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        open(output, "w", encoding).write(content)
+    else:
+        codecs.getwriter(encoding)(sys.stdout).write(content)
 
 
 def main(argv):
@@ -488,23 +458,9 @@ def main(argv):
         options.contexts, options.encoding, options.werror
     )
     paths = parse_template_paths(tmpl, options.template_paths)
-
-    if options.vars:
-        vars = list(find_vars(tmpl, paths))
-        for v in vars:
-            print v
-        sys.exit(0)
-
     result = render(tmpl, ctx, paths)
 
-    if options.output and not options.output == '-':
-        outdir = os.path.dirname(options.output)
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
-
-        open(options.output, "w", options.encoding).write(result)
-    else:
-        codecs.getwriter(options.encoding)(sys.stdout).write(result)
+    write_to_output(options.output, options.encoding, result)
 
 
 if __name__ == '__main__':
