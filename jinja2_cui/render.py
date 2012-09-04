@@ -297,35 +297,6 @@ def get_ast(filepath, paths):
         return None
 
 
-def find_templates(filepath, paths, acc=[]):
-    """
-    Find and return template paths including ones refered in given template
-    recursively.
-
-    :param filepath: Maybe base filepath of template file
-    :param paths: Template search paths
-    """
-    filepath = template_path(filepath, paths)
-    ast = get_ast(filepath, paths)
-
-    if ast:
-        if filepath not in acc:
-            acc.append(filepath)  # Add self.
-
-        ref_templates = [
-            template_path(f, paths) for f in
-                jinja2.meta.find_referenced_templates(ast) if f
-        ]
-
-        for f in ref_templates:
-            if f not in acc:
-                acc.append(f)
-
-            acc += [t for t in find_templates(f, paths, acc) if t not in acc]
-
-    return acc
-
-
 def flip(xy):
     (x, y) = xy
     return (y, x)

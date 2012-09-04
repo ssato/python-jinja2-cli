@@ -41,6 +41,35 @@ from logging import DEBUG, INFO
 from operator import concat as listplus
 
 
+def find_templates(filepath, paths, acc=[]):
+    """
+    Find and return template paths including ones refered in given template
+    recursively.
+
+    :param filepath: Maybe base filepath of template file
+    :param paths: Template search paths
+    """
+    filepath = template_path(filepath, paths)
+    ast = get_ast(filepath, paths)
+
+    if ast:
+        if filepath not in acc:
+            acc.append(filepath)  # Add self.
+
+        ref_templates = [
+            template_path(f, paths) for f in
+                jinja2.meta.find_referenced_templates(ast) if f
+        ]
+
+        for f in ref_templates:
+            if f not in acc:
+                acc.append(f)
+
+            acc += [t for t in find_templates(f, paths, acc) if t not in acc]
+
+    return acc
+
+
 def find_vars_0(filepath, paths):
     """
     Find and return variables in given template.
@@ -62,7 +91,7 @@ def find_vars_0(filepath, paths):
         else:
             return []
 
-    return [(f, find_undecls_0(f)) for f in R.find_templates(filepath, paths)]
+    return [(f, find_undecls_0(f)) for f in find_templates(filepath, paths)]
 
 
 def find_vars(filepath, paths):
