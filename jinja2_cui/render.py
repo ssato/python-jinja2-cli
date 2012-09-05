@@ -34,6 +34,8 @@
  References: http://jinja.pocoo.org,
     especially http://jinja.pocoo.org/docs/api/#basics
 """
+from jinja2.exceptions import TemplateNotFound
+
 import codecs
 import glob
 import itertools
@@ -244,12 +246,50 @@ def render_s(tmpl_s, ctx, paths=[os.curdir]):
     :param paths: Template search paths
 
     >>> render_s('a = {{ a }}, b = "{{ b }}"', {'a': 1, 'b': 'bbb'})
-    'a = 1, b = "bbb"'
+    u'a = 1, b = "bbb"'
     """
     return tmpl_env(paths).from_string(tmpl_s).render(**ctx)
 
 
-def render(filepath, ctx, paths):
+def render_impl(filepath, ctx, paths):
+    """
+    :param filepath: (Base) filepath of template file or '-' (stdin)
+    :param ctx: Context dict needed to instantiate templates
+    :param paths: Template search paths
+    """
+    env = tmpl_env(paths)
+    return env.get_template(os.path.basename(filepath)).render(**ctx)
+
+
+def chaincalls(callables, x):
+    """
+    :param callables: callable objects to apply to x in this order
+    :param x: Object to apply callables
+    """
+    for c in callables:
+        assert callable(c), "%s is not callable object!" % str(c)
+        x = c(x)
+
+    return x
+
+
+def normpath(path):
+    """Normalize given path.
+
+    >>> normpath("/tmp/../etc/hosts")
+    '/etc/hosts'
+    >>> normpath("~root/t")
+    '/root/t'
+    """
+    if "~" in path:
+        fs = [os.path.expanduser, os.path.normpath, os.path.abspath]
+    else:
+        fs = [os.path.normpath, os.path.abspath]
+
+    return chaincalls(fs, path)
+
+
+def render(filepath, ctx, paths, ask=False):
     """
     Compile and render template, and return the result.
 
@@ -259,12 +299,25 @@ def render(filepath, ctx, paths):
     :param filepath: (Base) filepath of template file or '-' (stdin)
     :param ctx: Context dict needed to instantiate templates
     :param paths: Template search paths
+    :param ask: Ask user for missing template location if True
     """
     if filepath == '-':
         return render_s(sys.stdin.read(), ctx, paths)
     else:
-        env = tmpl_env(paths)
-        return env.get_template(os.path.basename(filepath)).render(**ctx)
+        try:
+            return render_impl(filepath, ctx, paths)
+        except TemplateNotFound, mtmpl:
+            if not ask:
+                raise TemplateNotFound(mtmpl)  # raise this exc. again
+
+            usr_tmpl = raw_input(
+                "\n*** Missing template '%s'. "
+                "Please enter its location (path): " % mtmpl
+            )
+            usr_tmpl = normpath(usr_tmpl.strip())
+            usr_tmpldir = os.path.dirname(usr_tmpl)
+
+            return render_impl(usr_tmpl, ctx, paths + [usr_tmpldir])
 
 
 def template_path(filepath, paths):
