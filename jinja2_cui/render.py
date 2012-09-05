@@ -62,7 +62,7 @@ except AttributeError:
 
 # Data loaders: Key=file_extension, Value=load_func
 _LOADERS = {}
-_ENCODING = locale.getdefaultlocale()[1]
+_ENCODING = locale.getdefaultlocale()[1] or "utf-8"
 
 sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
 
