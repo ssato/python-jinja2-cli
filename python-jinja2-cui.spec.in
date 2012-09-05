@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Sep  5 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.10-1
+- Added 'ask' parameter in jinja2_cui.render.render to assist user passing
+  templates if templates are missing
+
 * Wed Sep  5 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.9-1
 - Fixed a bug that jinja2-cui crashes if LANG is C and _ENCODING becomes None
 
