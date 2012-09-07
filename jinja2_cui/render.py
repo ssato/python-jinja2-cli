@@ -404,7 +404,8 @@ def parse_filespec(fspec, sep=':', gpat='*'):
     tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else \
         (get_fileext(fspec), fspec)
 
-    return [(fs, ft) for fs in glob.glob(fp)] if gpat in fspec else [flip(tp)]
+    return [(fs, ft) for fs in sorted(glob.glob(fp))] \
+        if gpat in fspec else [flip(tp)]
 
 
 def parse_and_load_contexts(contexts, enc, werr):

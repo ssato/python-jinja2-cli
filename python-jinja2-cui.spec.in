@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep  7 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.11-1
+- Made sure that list of filespecs for load_contexts is sorted
+
 * Wed Sep  5 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.10-1
 - Added 'ask' parameter in jinja2_cui.render.render to assist user passing
   templates if templates are missing
