@@ -187,7 +187,7 @@ def load_context(filepath, filetype=None, enc=_ENCODING, werror=False):
         return default
 
 
-def load_contexts(pathspecs, enc, werror=False):
+def load_contexts(pathspecs, enc=_ENCODING, werror=False):
     """Load context data from given files.
 
     :param paths: Context data file path list :: [str]
