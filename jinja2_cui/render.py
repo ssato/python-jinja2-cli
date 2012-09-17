@@ -308,7 +308,7 @@ def render(filepath, ctx, paths, ask=False):
             return render_impl(filepath, ctx, paths)
         except TemplateNotFound, mtmpl:
             if not ask:
-                raise TemplateNotFound(mtmpl)  # raise this exc. again
+                raise RuntimeError("Template Not found: " + mtmpl)
 
             usr_tmpl = raw_input(
                 "\n*** Missing template '%s'. "
@@ -408,7 +408,7 @@ def parse_filespec(fspec, sep=':', gpat='*'):
         if gpat in fspec else [flip(tp)]
 
 
-def parse_and_load_contexts(contexts, enc, werr):
+def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
     """
     :param contexts: list of context file specs
     :param enc: Input encoding of context files
@@ -450,7 +450,7 @@ def parse_template_paths(tmpl, paths, sep=":"):
 def option_parser(argv=sys.argv):
     defaults = dict(
         template_paths=None, output=None, contexts=[], debug=False,
-        encoding=_ENCODING, werror=False,
+        encoding=_ENCODING, werror=False, ask=False,
     )
 
     p = optparse.OptionParser(
@@ -493,6 +493,10 @@ def write_to_output(output=None, encoding="utf-8", content=""):
         codecs.getwriter(encoding)(sys.stdout).write(content)
 
 
+def renderto(tmpl, ctx, paths, output=None, encoding=_ENCODING, ask=True):
+    write_to_output(output, encoding, render(tmpl, ctx, paths, ask))
+
+
 def main(argv):
     p = option_parser(argv)
     (options, args) = p.parse_args(argv[1:])
@@ -508,9 +512,7 @@ def main(argv):
         options.contexts, options.encoding, options.werror
     )
     paths = parse_template_paths(tmpl, options.template_paths)
-    result = render(tmpl, ctx, paths)
-
-    write_to_output(options.output, options.encoding, result)
+    renderto(tmpl, ctx, paths, options.output, options.encoding)
 
 
 if __name__ == '__main__':
