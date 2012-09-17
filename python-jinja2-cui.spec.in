@@ -55,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 17 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.12-1
+- Minor bug fixes and enhancements
+
 * Fri Sep  7 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.11-1
 - Made sure that list of glob-ed filespecs for load_contexts is sorted
 
