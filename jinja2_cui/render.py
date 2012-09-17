@@ -505,7 +505,10 @@ def main(argv):
         p.print_help()
         sys.exit(0)
 
-    logging.getLogger().setLevel(DEBUG if options.debug else INFO)
+    logging.basicConfig(
+        format="[%(levelname)s] %(message)s",
+        level=(DEBUG if options.debug else INFO),
+    )
 
     tmpl = args[0]
     ctx = parse_and_load_contexts(
