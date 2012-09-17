@@ -308,7 +308,7 @@ def render(filepath, ctx, paths, ask=False):
             return render_impl(filepath, ctx, paths)
         except TemplateNotFound, mtmpl:
             if not ask:
-                raise RuntimeError("Template Not found: " + mtmpl)
+                raise RuntimeError("Template Not found: " + str(mtmpl))
 
             usr_tmpl = raw_input(
                 "\n*** Missing template '%s'. "
