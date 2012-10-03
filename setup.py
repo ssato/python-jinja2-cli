@@ -1,4 +1,5 @@
-from distutils.core import setup, Command
+#from distutils.core import setup, Command
+from setuptools import setup, Command, find_packages
 
 import datetime
 import glob
@@ -74,15 +75,14 @@ setup(name=PACKAGE,
     author_email="ssato@redhat.com",
     license="BSD",
     url="https://github.com/ssato/python-jinja2-cui",
-    packages=[
-        "jinja2_cui",
-    ],
+    packages=find_packages(),
     scripts=glob.glob("src/*"),
     data_files=data_files,
     cmdclass={
         "srpm": SrpmCommand,
         "rpm":  RpmCommand,
     },
+    #test_suite='nose.collector',
 )
 
 # vim:sw=4:ts=4:et:
