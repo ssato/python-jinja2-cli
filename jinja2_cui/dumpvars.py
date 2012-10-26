@@ -49,15 +49,15 @@ def find_templates(filepath, paths, acc=[]):
     :param filepath: Maybe base filepath of template file
     :param paths: Template search paths
     """
-    filepath = template_path(filepath, paths)
-    ast = get_ast(filepath, paths)
+    filepath = R.template_path(filepath, paths)
+    ast = R.get_ast(filepath, paths)
 
     if ast:
         if filepath not in acc:
             acc.append(filepath)  # Add self.
 
         ref_templates = [
-            template_path(f, paths) for f in
+            R.template_path(f, paths) for f in
                 jinja2.meta.find_referenced_templates(ast) if f
         ]
 
