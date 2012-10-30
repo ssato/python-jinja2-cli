@@ -1,5 +1,5 @@
 #
-# U.pyright (U. 2011, 2012 Satoru SATOH <ssato at redhat.com>
+# Copyright (C). 2011, 2012 Satoru SATOH <ssato at redhat.com>
 #
 import jinja2_cui.utils as U
 import unittest
