@@ -40,6 +40,54 @@ from functools import reduce as foldl
 from logging import DEBUG, INFO
 from operator import concat as listplus
 
+from jinja2.compiler import CodeGenerator
+from jinja2.visitor import NodeVisitor
+
+class AttrTrackingCodeGenerator(CodeGenerator):
+    def __init__(self, environment, target_var):
+        CodeGenerator.__init__(self, environment, '<introspection>',
+                               '<introspection>')
+        self.target_var = target_var
+        self.attrs = []
+
+    def pull_dependencies(self, nodes):
+        visitor = AttrVisitor(self.target_var, self.attrs)
+        for node in nodes:
+            visitor.visit(node)
+       
+class AttrVisitor(NodeVisitor):
+    def __init__(self, target_var, attrs):
+        self.target_var = target_var
+        self.attrs   = attrs
+        self.astack = []
+        NodeVisitor.__init__(self)
+
+    def visit_Name(self, node):
+        store = False
+        if self.astack == []:
+            store = True
+        if node.name == self.target_var:
+            self.astack.append(node.name)
+            if store:
+                self.attrs.append(self.astack)
+                self.astack = []
+
+    def visit_Getattr(self, node):
+        store = False
+        if self.astack == []:
+            store = True
+        self.astack.append(node.attr)
+        self.visit(node.node)
+        if store:
+            if self.astack[-1] == self.target_var:
+                self.astack.reverse()
+                self.attrs.append(self.astack)
+            self.astack = []            
+
+def find_attrs(ast, target_var):
+    tracker = AttrTrackingCodeGenerator(ast.environment, target_var)
+    tracker.visit(ast)
+    return tracker.attrs
 
 def find_templates(filepath, paths, acc=[]):
     """
@@ -87,7 +135,7 @@ def find_vars_0(filepath, paths):
     def find_undecls_0(fpath, paths=paths):
         ast_ = R.get_ast(fpath, paths)
         if ast_:
-            return list(jinja2.meta.find_undeclared_variables(ast_))
+            return [find_attrs(ast_, v) for v in jinja2.meta.find_undeclared_variables(ast_)]
         else:
             return []
 
@@ -139,7 +187,7 @@ def main(argv):
     tmpl = args[0]
     paths = R.parse_template_paths(tmpl, options.template_paths)
 
-    vars = '\n'.join(find_vars(tmpl, paths)) + '\n'
+    vars = ''.join(['\n'.join(v) + '\n' for v in sorted([['.'.join(e) for e in elt] for elt in find_vars(tmpl, paths)])])
     R.write_to_output(options.output, options.encoding, vars)
 
 
