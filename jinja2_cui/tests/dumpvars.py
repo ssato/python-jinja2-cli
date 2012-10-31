@@ -14,8 +14,7 @@ class Test_dumpvar(unittest.TestCase):
                                                    ['c', 'c0', 'c2'],
                                                    ['c', 'c1']])
 
+if __name__ == '__main__':
+    unittest.main()
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test_dumpvar))
-    return suite
+# vim:sw=4:ts=4:et:
