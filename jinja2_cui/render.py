@@ -36,6 +36,8 @@
 """
 from jinja2.exceptions import TemplateNotFound
 
+import jinja2_cui.utils as U
+
 import codecs
 import glob
 import itertools
@@ -49,17 +51,6 @@ import os
 import sys
 
 from logging import DEBUG, INFO
-
-try:
-    chain_from_iterable = itertools.chain.from_iterable
-except AttributeError:
-    # Borrowed from library doc, 9.7.1 Itertools functions:
-    def _from_iterable(iterables):
-        for it in iterables:
-            for element in it:
-                yield element
-
-    chain_from_iterable = _from_iterable
 
 
 # Data loaders: Key=file_extension, Value=load_func
@@ -91,42 +82,6 @@ except ImportError:
     sys.stderr.write(u"YAML support is disabled as module not found.\n")
 
 
-def is_dict(x):
-    return isinstance(x, (MyDict, dict))
-
-
-def is_iterable(x):
-    return isinstance(x, (list, tuple)) or getattr(x, "next", False)
-
-
-class MyDict(dict):
-
-    @classmethod
-    def createFromDict(cls, dic={}):
-        md = MyDict()
-
-        for k, v in dic.iteritems():
-            md[k] = cls.createFromDict(v) if is_dict(v) else v
-
-        return md
-
-    def update(self, other, merge_lists=False):
-        """Merge `self` and `other` recursively.
-
-        :param merge_lists: Merge not only dicts but also lists,
-            e.g. [1, 2], [3, 4] ==> [1, 2, 3, 4]
-        """
-        if is_dict(other):
-            for k, v in other.iteritems():
-                if k in self and is_dict(v) and is_dict(self[k]):
-                    self[k].update(v, merge_lists)  # update recursively.
-                else:
-                    if merge_lists and is_iterable(v):
-                        self[k] = self[k] + list(v)  # append v :: list
-                    else:
-                        self[k] = v  # replace self[k] w/ v or set.
-
-
 def get_fileext(filepath):
     """
     >>> get_fileext("a.json")
@@ -137,9 +92,8 @@ def get_fileext(filepath):
     return os.path.splitext(filepath)[1][1:]
 
 
-def get_loader(filepath=None, filetype=None, loaders=_LOADERS):
+def find_loader(filepath=None, filetype=None, loaders=_LOADERS):
     if filepath is None and filetype is None:
-        logging.error("Could not determine loader type")
         return None
 
     if filepath is None or filetype is not None:
@@ -158,26 +112,26 @@ def load_context(filepath, filetype=None, enc=_ENCODING, werror=False):
     :param enc: Character encoding of context file
     :param werror: raise exception if any error occured like gcc's -Werr
     """
-    default = MyDict.createFromDict()
+    default = U.MyDict.createFromDict()
 
-    loader = get_loader(filepath, filetype)
+    loader = find_loader(filepath, filetype)
     if loader is None:
-        m = "Couldn't get loader: path=%s, type=%s" % (filepath, filetype)
+        m = "Couldn't find loader: path=%s, type=%s" % (filepath, filetype)
         if werror:
             raise RuntimeError(m)
 
         logging.warn(m)
-        return default
+        return default  # Return empty dict.
 
     logging.debug("Loader found: path=%s, type=%s" % (filepath, filetype))
     data = open(filepath, enc=enc).read()
     try:
         x = loader(data)
-        if not is_dict(x):
+        if not U.is_dict(x):
             logging.warn("Top-level object is not a dict: " + filepath)
             return default
 
-        return MyDict.createFromDict(x)
+        return U.MyDict.createFromDict(x)
 
     except Exception, e:
         if werror:
@@ -192,29 +146,13 @@ def load_contexts(pathspecs, enc=_ENCODING, werror=False):
 
     :param paths: Context data file path list :: [str]
     """
-    d = MyDict.createFromDict()
+    d = U.MyDict.createFromDict()
     for path, filetype in pathspecs:
         diff = load_context(path, filetype, enc, werror)
         if diff:
             d.update(diff)
 
     return d
-
-
-def uniq(xs):
-    """Remove duplicates in given list with its order kept.
-
-    >>> uniq([])
-    []
-    >>> uniq([1, 4, 5, 1, 2, 3, 5, 10])
-    [1, 4, 5, 2, 3, 10]
-    """
-    acc = xs[:1]
-    for x in xs[1:]:
-        if x not in acc:
-            acc += [x]
-
-    return acc
 
 
 def mk_template_paths(filepath, template_paths=[]):
@@ -224,7 +162,7 @@ def mk_template_paths(filepath, template_paths=[]):
     """
     tmpldir = os.path.abspath(os.path.dirname(filepath))
     if template_paths:
-        return uniq(template_paths + [tmpldir])
+        return U.uniq(template_paths + [tmpldir])
     else:
         # default:
         return [os.curdir, tmpldir]
@@ -261,34 +199,6 @@ def render_impl(filepath, ctx, paths):
     return env.get_template(os.path.basename(filepath)).render(**ctx)
 
 
-def chaincalls(callables, x):
-    """
-    :param callables: callable objects to apply to x in this order
-    :param x: Object to apply callables
-    """
-    for c in callables:
-        assert callable(c), "%s is not callable object!" % str(c)
-        x = c(x)
-
-    return x
-
-
-def normpath(path):
-    """Normalize given path.
-
-    >>> normpath("/tmp/../etc/hosts")
-    '/etc/hosts'
-    >>> normpath("~root/t")
-    '/root/t'
-    """
-    if "~" in path:
-        fs = [os.path.expanduser, os.path.normpath, os.path.abspath]
-    else:
-        fs = [os.path.normpath, os.path.abspath]
-
-    return chaincalls(fs, path)
-
-
 def render(filepath, ctx, paths, ask=False):
     """
     Compile and render template, and return the result.
@@ -314,7 +224,7 @@ def render(filepath, ctx, paths, ask=False):
                 "\n*** Missing template '%s'. "
                 "Please enter its location (path): " % mtmpl
             )
-            usr_tmpl = normpath(usr_tmpl.strip())
+            usr_tmpl = U.normpath(usr_tmpl.strip())
             usr_tmpldir = os.path.dirname(usr_tmpl)
 
             return render_impl(usr_tmpl, ctx, paths + [usr_tmpldir])
@@ -350,31 +260,6 @@ def get_ast(filepath, paths):
         return None
 
 
-def flip(xy):
-    (x, y) = xy
-    return (y, x)
-
-
-def concat(xss):
-    """
-    >>> concat([[]])
-    []
-    >>> concat((()))
-    []
-    >>> concat([[1,2,3],[4,5]])
-    [1, 2, 3, 4, 5]
-    >>> concat([[1,2,3],[4,5,[6,7]]])
-    [1, 2, 3, 4, 5, [6, 7]]
-    >>> concat(((1,2,3),(4,5,[6,7])))
-    [1, 2, 3, 4, 5, [6, 7]]
-    >>> concat(((1,2,3),(4,5,[6,7])))
-    [1, 2, 3, 4, 5, [6, 7]]
-    >>> concat((i, i*2) for i in range(3))
-    [0, 0, 1, 2, 2, 4]
-    """
-    return list(chain_from_iterable(xs for xs in xss))
-
-
 # TODO:
 #def __is_glob(s, gpat='*'):
 #    return gpat in s and ...
@@ -405,7 +290,7 @@ def parse_filespec(fspec, sep=':', gpat='*'):
         (get_fileext(fspec), fspec)
 
     return [(fs, ft) for fs in sorted(glob.glob(fp))] \
-        if gpat in fspec else [flip(tp)]
+        if gpat in fspec else [U.flip(tp)]
 
 
 def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
@@ -417,7 +302,7 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
     """
     if contexts:
         ctx = load_contexts(
-            concat(parse_filespec(f) for f in contexts), enc, werr
+            U.concat(parse_filespec(f) for f in contexts), enc, werr
         )
     else:
         ctx = MyDict.createFromDict()
