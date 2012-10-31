@@ -43,6 +43,7 @@ from operator import concat as listplus
 from jinja2.compiler import CodeGenerator
 from jinja2.visitor import NodeVisitor
 
+
 class AttrTrackingCodeGenerator(CodeGenerator):
     def __init__(self, environment, target_var):
         CodeGenerator.__init__(self, environment, '<introspection>',
@@ -54,11 +55,12 @@ class AttrTrackingCodeGenerator(CodeGenerator):
         visitor = AttrVisitor(self.target_var, self.attrs)
         for node in nodes:
             visitor.visit(node)
-       
+
+
 class AttrVisitor(NodeVisitor):
     def __init__(self, target_var, attrs):
         self.target_var = target_var
-        self.attrs   = attrs
+        self.attrs = attrs
         self.astack = []
         NodeVisitor.__init__(self)
 
@@ -82,12 +84,14 @@ class AttrVisitor(NodeVisitor):
             if self.astack[-1] == self.target_var:
                 self.astack.reverse()
                 self.attrs.append(self.astack)
-            self.astack = []            
+            self.astack = []
+
 
 def find_attrs(ast, target_var):
     tracker = AttrTrackingCodeGenerator(ast.environment, target_var)
     tracker.visit(ast)
     return tracker.attrs
+
 
 def find_templates(filepath, paths, acc=[]):
     """
@@ -135,7 +139,10 @@ def find_vars_0(filepath, paths):
     def find_undecls_0(fpath, paths=paths):
         ast_ = R.get_ast(fpath, paths)
         if ast_:
-            return [find_attrs(ast_, v) for v in jinja2.meta.find_undeclared_variables(ast_)]
+            return [
+                find_attrs(ast_, v) for v in
+                    jinja2.meta.find_undeclared_variables(ast_)
+            ]
         else:
             return []
 
@@ -187,7 +194,12 @@ def main(argv):
     tmpl = args[0]
     paths = R.parse_template_paths(tmpl, options.template_paths)
 
-    vars = ''.join(['\n'.join(v) + '\n' for v in sorted([['.'.join(e) for e in elt] for elt in find_vars(tmpl, paths)])])
+    vars = ''.join(
+        ('\n'.join(v) + '\n' for v in
+            sorted((['.'.join(e) for e in elt] for elt in
+                find_vars(tmpl, paths)))
+        )
+    )
     R.write_to_output(options.output, options.encoding, vars)
 
 
