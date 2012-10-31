@@ -21,10 +21,7 @@ class Test_functions(unittest.TestCase):
         self.assertFalse(R.is_iterable(None))
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test_functions))
-    return suite
-
+if __name__ == '__main__':
+    unittest.main()
 
 # vim:sw=4:ts=4:et:
