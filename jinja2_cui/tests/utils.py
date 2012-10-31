@@ -55,7 +55,7 @@ class Test_00_functions(unittest.TestCase):
         )
 
 
-class TestMyDict(unittest.TestCase):
+class Test_10_MyDict(unittest.TestCase):
 
     def test_createFromDict(self):
         self.assertTrue(isinstance(U.MyDict.createFromDict({}), U.MyDict))
@@ -84,11 +84,7 @@ class TestMyDict(unittest.TestCase):
         self.assertEquals(md1["a"], [1, 2, 3, 4])
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test_functions))
-    suite.addTest(unittest.makeSuite(TestMyDict))
-    return suite
-
+if __name__ == '__main__':
+    unittest.main()
 
 # vim:sw=4:ts=4:et:
