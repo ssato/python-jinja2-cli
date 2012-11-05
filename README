@@ -21,7 +21,7 @@ Multiple configuration files support
 -------------------------------------
 
 It supports multiple configuration files in YAML or JSON to set parameters w/
--C|--contexts option, ex. -C a.yaml,b.yaml,c.json.
+-C|--contexts option, ex. -C a.yaml -C b.yaml -C c.json.
 
 NOTE: when multi-config files specified in -C option, parameters in these are
 synthesized in a configuration, that is, if the content of a.yaml is::
@@ -39,7 +39,7 @@ and the content of b.yaml is::
 
    b: "bbb"
 
-then -C a.yaml,b.yaml will provide a configuration such as
+then "-C a.yaml -C b.yaml" will provide a configuration such as
 
    a:
      x: {'x': 0, 'y': 4, 'z': 2}
