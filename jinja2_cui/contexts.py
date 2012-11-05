@@ -7,14 +7,9 @@ import jinja2_cui.utils as U
 
 import codecs
 import glob
-import itertools
-import jinja2
-import jinja2.meta
 import locale
 import logging
-import optparse
 import os.path
-import os
 import sys
 
 # Data loaders: Key=file_extension, Value=load_func
