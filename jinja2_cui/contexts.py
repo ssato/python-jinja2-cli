@@ -159,7 +159,7 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
             U.concat(parse_filespec(f) for f in contexts), enc, werr
         )
     else:
-        ctx = MyDict.createFromDict()
+        ctx = U.MyDict.createFromDict()
 
     return ctx
 
