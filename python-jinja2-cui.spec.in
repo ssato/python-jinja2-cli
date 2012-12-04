@@ -55,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Dec  4 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.14-1
+- Bug fix in jinja2_cui.contexts that unresolved module, MyDict
+
 * Mon Sep 17 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.12-1
 - Minor bug fixes and enhancements
 
