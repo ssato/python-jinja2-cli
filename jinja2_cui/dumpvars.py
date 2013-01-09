@@ -31,6 +31,7 @@
  References: http://jinja.pocoo.org
 """
 import jinja2_cui.render as R
+import jinja2_cui.utils as U
 import jinja2.meta
 import logging
 import optparse
@@ -150,7 +151,7 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    return R.uniq(
+    return U.uniq(
         foldl(listplus, (vs[1] for vs in find_vars_0(filepath, paths)), [])
     )
 
