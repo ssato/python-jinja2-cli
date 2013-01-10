@@ -55,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jan 10 2013 Satoru SATOH <ssato@redhat.com> - 0.0.3.15-1
+- Bug fix in jinja2_cui.dumpvars that unresolved function
+
 * Tue Dec  4 2012 Satoru SATOH <ssato@redhat.com> - 0.0.3.14-1
 - Bug fix in jinja2_cui.contexts that unresolved module, MyDict
 
