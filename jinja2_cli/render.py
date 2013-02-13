@@ -147,20 +147,6 @@ def template_path(filepath, paths):
     return None
 
 
-def get_ast(filepath, paths):
-    """Parse template (`filepath`) and return an abstract syntax tree.
-
-    see also: http://jinja.pocoo.org/docs/api/#the-meta-api
-
-    :param filepath: (Base) filepath of template file
-    :param paths: Template search paths
-    """
-    try:
-        return tmpl_env(paths).parse(open(filepath).read())
-    except:
-        return None
-
-
 def parse_template_paths(tmpl, paths, sep=":"):
     """
     Parse template_paths option string and return [template_path].

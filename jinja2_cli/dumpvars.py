@@ -94,6 +94,20 @@ def find_attrs(ast, target_var):
     return tracker.attrs
 
 
+def get_ast(filepath, paths):
+    """Parse template (`filepath`) and return an abstract syntax tree.
+
+    see also: http://jinja.pocoo.org/docs/api/#the-meta-api
+
+    :param filepath: (Base) filepath of template file
+    :param paths: Template search paths
+    """
+    try:
+        return R.tmpl_env(paths).parse(open(filepath).read())
+    except:
+        return None
+
+
 def find_templates(filepath, paths, acc=[]):
     """
     Find and return template paths including ones refered in given template
@@ -103,7 +117,7 @@ def find_templates(filepath, paths, acc=[]):
     :param paths: Template search paths
     """
     filepath = R.template_path(filepath, paths)
-    ast = R.get_ast(filepath, paths)
+    ast = get_ast(filepath, paths)
 
     if ast:
         if filepath not in acc:
