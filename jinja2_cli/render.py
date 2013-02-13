@@ -40,7 +40,9 @@ import jinja2_cli.utils as U
 
 import anyconfig.api as A
 import codecs
+import glob
 import jinja2
+import locale
 import logging
 import optparse
 import os.path
@@ -50,7 +52,10 @@ import sys
 from logging import DEBUG, INFO
 
 
-_ENCODING = "utf-8"
+_ENCODING = locale.getdefaultlocale()[1]
+sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
+sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
+open = codecs.open
 
 
 def mk_template_paths(filepath, template_paths=[]):
@@ -227,7 +232,7 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
 def option_parser(argv=sys.argv):
     defaults = dict(
         template_paths=None, output=None, contexts=[], debug=False,
-        werror=False, ask=False,
+        encoding=_ENCODING, werror=False, ask=False,
     )
 
     p = optparse.OptionParser(
@@ -265,7 +270,7 @@ def write_to_output(output=None, encoding="utf-8", content=""):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        open(output, "w").write(content)
+        open(output, "w", encoding).write(content)
     else:
         codecs.getwriter(encoding)(sys.stdout).write(content)
 
