@@ -36,12 +36,11 @@
 """
 from jinja2.exceptions import TemplateNotFound
 
-import jinja2_cli.contexts as C
 import jinja2_cli.utils as U
 
+import anyconfig as A
 import codecs
 import jinja2
-import jinja2.meta
 import logging
 import optparse
 import os.path
@@ -51,9 +50,7 @@ import sys
 from logging import DEBUG, INFO
 
 
-_ENCODING = C._ENCODING
-open = C.open
-sys.stderr = C.sys.stderr
+_ENCODING = "utf-8"
 
 
 def mk_template_paths(filepath, template_paths=[]):
@@ -169,10 +166,63 @@ def parse_template_paths(tmpl, paths, sep=":"):
     return paths
 
 
+def get_fileext(filepath):
+    """
+    >>> get_fileext("a.json")
+    'json'
+    >>> get_fileext("abc")
+    ''
+    """
+    return os.path.splitext(filepath)[1][1:]
+
+
+def parse_filespec(fspec, sep=':', gpat='*'):
+    """
+    Parse given filespec `fspec` and return [(filetype, filepath)].
+
+    :param fspec: filespec
+    :param sep: a char separating filetype and filepath in filespec
+    :param gpat: a char for glob pattern
+
+    >>> parse_filespec("base.json")
+    [('base.json', 'json')]
+    >>> parse_filespec("yaml:foo.yaml")
+    [('foo.yaml', 'yaml')]
+    >>> parse_filespec("yaml:foo.dat")
+    [('foo.dat', 'yaml')]
+
+    # FIXME: How to test it?
+    # >>> parse_filespec("yaml:bar/*.conf")
+    # [('bar/a.conf', 'yaml'), ('bar/b.conf', 'yaml')]
+
+    TODO: Allow '*' (glob pattern) in filepath when escaped with '\\', etc.
+    """
+    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else \
+        (get_fileext(fspec), fspec)
+
+    return [(fs, ft) for fs in sorted(glob.glob(fp))] \
+        if gpat in fspec else [U.flip(tp)]
+
+
+def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
+    """
+    :param contexts: list of context file specs
+    :param enc: Input encoding of context files (dummy param)
+    :param werr: Exit immediately if True and any errors occurrs
+        while loading context files
+    """
+    if contexts:
+        ctx = A.load(U.concat(parse_filespec(f) for f in contexts))
+    else:
+        ctx = dict()
+
+    return ctx
+
+
 def option_parser(argv=sys.argv):
     defaults = dict(
         template_paths=None, output=None, contexts=[], debug=False,
-        encoding=_ENCODING, werror=False, ask=False,
+        werror=False, ask=False,
     )
 
     p = optparse.OptionParser(

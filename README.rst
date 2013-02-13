@@ -23,31 +23,10 @@ Multiple configuration files support
 It supports multiple configuration files in YAML or JSON to set parameters w/
 -C|--contexts option, ex. -C a.yaml -C b.yaml -C c.json.
 
-NOTE: when multi-config files specified in -C option, parameters in these are
-synthesized in a configuration, that is, if the content of a.yaml is::
+Composition of config files are handled by external python-anyconfig module.
 
-   a:
-     x: {'y': 1, 'z': 2}
-     n: "aaa"
-
-and the content of b.yaml is::
-
-   a:
-     x: {'y': 4, 'x': 0}
-     m: "mmm"
-     n: "bbb"
-
-   b: "bbb"
-
-then "-C a.yaml -C b.yaml" will provide a configuration such as
-
-   a:
-     x: {'x': 0, 'y': 4, 'z': 2}
-     m: "mmm"
-     n: "bbb"
-
-   b: "bbb"
-
+* anyconfig on PyPI: http://pypi.python.org/pypi/anyconfig/
+* python-anyconfig github site: https://github.com/ssato/python-anyconfig
 
 Template search paths
 ------------------------------
@@ -60,10 +39,8 @@ directory in which the given template file exists if -T option is not given.
 And even if -T option is used, templatedir will be appended to that search
 paths at the end.
 
-
 Examples
 ==============================
 
 please try `make -C examples` and  see the results:
 "/tmp/jinja2-cli.examples.d/*.out"
-
