@@ -57,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.2-1
+- Fixed some output encoding related bugs
+
 * Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.1-1
 - Renamed project, s/cui/cli/ as it looks much common
 - Removed MyDict and contexts parsing related code and made it utilizing
