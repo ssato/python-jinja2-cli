@@ -46,42 +46,6 @@ except AttributeError:
     chain_from_iterable = _from_iterable
 
 
-def is_dict(x):
-    return isinstance(x, (MyDict, dict))
-
-
-def is_iterable(x):
-    return isinstance(x, (list, tuple)) or getattr(x, "next", False)
-
-
-class MyDict(dict):
-
-    @classmethod
-    def createFromDict(cls, dic={}):
-        md = MyDict()
-
-        for k, v in dic.iteritems():
-            md[k] = cls.createFromDict(v) if is_dict(v) else v
-
-        return md
-
-    def update(self, other, merge_lists=False):
-        """Merge `self` and `other` recursively.
-
-        :param merge_lists: Merge not only dicts but also lists,
-            e.g. [1, 2], [3, 4] ==> [1, 2, 3, 4]
-        """
-        if is_dict(other):
-            for k, v in other.iteritems():
-                if k in self and is_dict(v) and is_dict(self[k]):
-                    self[k].update(v, merge_lists)  # update recursively.
-                else:
-                    if merge_lists and is_iterable(v):
-                        self[k] = self[k] + list(v)  # append v :: list
-                    else:
-                        self[k] = v  # replace self[k] w/ v or set.
-
-
 def uniq(xs):
     """Remove duplicates in given list with its order kept.
 
