@@ -22,6 +22,7 @@ Requires:       python-jinja2
 #%endif
 Requires:       PyYAML
 Requires:       python-anyconfig
+Obsoletes:      python-jinja2-cui
 
 
 %description
