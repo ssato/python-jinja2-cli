@@ -57,12 +57,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.2-1
-- Removed MyDict and contexts parsing related code and made it utilizing
-  python-anyconfig instead, as it's mature and well-tested than them.
-
 * Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.1-1
 - Renamed project, s/cui/cli/ as it looks much common
+- Removed MyDict and contexts parsing related code and made it utilizing
+  python-anyconfig instead, as it's mature and well-tested than them.
 
 * Thu Jan 10 2013 Satoru SATOH <ssato@redhat.com> - 0.0.3.15-1
 - Bug fix in jinja2_cui.dumpvars that unresolved function
