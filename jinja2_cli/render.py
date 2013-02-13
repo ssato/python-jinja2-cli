@@ -38,7 +38,7 @@ from jinja2.exceptions import TemplateNotFound
 
 import jinja2_cli.utils as U
 
-import anyconfig as A
+import anyconfig.api as A
 import codecs
 import jinja2
 import logging
@@ -211,10 +211,15 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
     :param werr: Exit immediately if True and any errors occurrs
         while loading context files
     """
+    ctx = A.container()  # see also: anyconfig.api
+
     if contexts:
-        ctx = A.load(U.concat(parse_filespec(f) for f in contexts))
-    else:
-        ctx = dict()
+        # print "contexts: " + str(contexts)
+        cspecs = U.concat(parse_filespec(f) for f in contexts)
+
+        for cspec in cspecs:
+            diff = A.load(*cspec)
+            ctx.update(diff)
 
     return ctx
 
@@ -260,7 +265,7 @@ def write_to_output(output=None, encoding="utf-8", content=""):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        open(output, "w", encoding).write(content)
+        open(output, "w").write(content)
     else:
         codecs.getwriter(encoding)(sys.stdout).write(content)
 
@@ -283,7 +288,7 @@ def main(argv):
     )
 
     tmpl = args[0]
-    ctx = C.parse_and_load_contexts(
+    ctx = parse_and_load_contexts(
         options.contexts, options.encoding, options.werror
     )
     paths = parse_template_paths(tmpl, options.template_paths)
