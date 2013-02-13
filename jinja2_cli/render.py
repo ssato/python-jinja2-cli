@@ -36,8 +36,8 @@
 """
 from jinja2.exceptions import TemplateNotFound
 
-import jinja2_cui.contexts as C
-import jinja2_cui.utils as U
+import jinja2_cli.contexts as C
+import jinja2_cli.utils as U
 
 import codecs
 import jinja2

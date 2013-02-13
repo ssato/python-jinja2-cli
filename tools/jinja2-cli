@@ -1,6 +1,6 @@
 #! /usr/bin/python
-import jinja2_cui.render as R
-import jinja2_cui.dumpvars as D
+import jinja2_cli.render as R
+import jinja2_cli.dumpvars as D
 
 from sys import argv
 
@@ -10,7 +10,7 @@ cmds = [("r", "render", R.main), ("d", "dumpvars", D.main)]
 
 
 def cmd2prog(c):
-    return "jinja2-cui " + c
+    return "jinja2-cli " + c
 
 
 def usage():

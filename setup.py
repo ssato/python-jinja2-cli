@@ -9,8 +9,8 @@ import sys
 curdir = os.getcwd()
 sys.path.append(curdir)
 
-PACKAGE = "python-jinja2-cui"
-VERSION = "0.0.3.15"
+PACKAGE = "python-jinja2-cli"
+VERSION = "0.0.4.1"
 
 # daily snapshots:
 #VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")
@@ -74,9 +74,9 @@ setup(name=PACKAGE,
     author="Satoru SATOH",
     author_email="ssato@redhat.com",
     license="BSD",
-    url="https://github.com/ssato/python-jinja2-cui",
+    url="https://github.com/ssato/python-jinja2-cli",
     packages=find_packages(),
-    scripts=glob.glob("src/*"),
+    scripts=glob.glob("tools/*"),
     data_files=data_files,
     cmdclass={
         "srpm": SrpmCommand,

@@ -1,9 +1,9 @@
-WORKDIR	?= /tmp/jinja2-cui.examples.d
+WORKDIR	?= /tmp/jinja2-cli.examples.d
 PYTHONPATH ?= $(PWD)
 EXAMPLESDIR ?= $(PYTHONPATH)/examples
 
-#render	?= jinja2-cui -D
-render	?= PYTHONPATH=$(PWD) python $(PYTHONPATH)/src/jinja2-cui
+#render	?= jinja2-cli -D
+render	?= PYTHONPATH=$(PWD) python $(PYTHONPATH)/tools/jinja2-cli
 
 # quick hack:
 define yaml2json =

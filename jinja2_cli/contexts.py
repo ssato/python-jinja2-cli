@@ -3,7 +3,7 @@
  :copyright: (c) 2012 by Satoru SATOH <ssato@redhat.com>
  :license: BSD-3
 """
-import jinja2_cui.utils as U
+import jinja2_cli.utils as U
 
 import codecs
 import glob

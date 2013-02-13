@@ -1,4 +1,4 @@
-import jinja2_cui.dumpvars as D
+import jinja2_cli.dumpvars as D
 import unittest
 from jinja2 import Environment, meta
 

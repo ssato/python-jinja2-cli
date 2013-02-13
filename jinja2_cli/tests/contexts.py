@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2012 Satoru SATOH <ssato at redhat.com>
 #
-import jinja2_cui.contexts as C
+import jinja2_cli.contexts as C
 import unittest
 
 

@@ -1,7 +1,7 @@
 About
-============
+======
 
-A CUI frontend for python-jinja2 based on:
+A CLI frontend for python-jinja2 based on:
 
 * https://github.com/ssato/misc/blob/master/jinja2_template_render.py
 
@@ -65,5 +65,5 @@ Examples
 ==============================
 
 please try `make -C examples` and  see the results:
-"/tmp/jinja2-cui.examples.d/*.out"
+"/tmp/jinja2-cli.examples.d/*.out"
 

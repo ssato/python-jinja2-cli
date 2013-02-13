@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2011, 2012 Satoru SATOH <ssato at redhat.com>
 #
-import jinja2_cui.render as R
+import jinja2_cli.render as R
 import unittest
 
 

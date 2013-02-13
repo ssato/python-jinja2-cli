@@ -1,9 +1,9 @@
 include MANIFEST.in
-include README
-include python-jinja2-cui.spec.in
+include README.*
+include python-jinja2-cli.spec.in
 include setup.py
-recursive-include jinja2_cui *.py
-include src/*
+recursive-include jinja2_cli *.py
+include tools/*
 include tests/*
 include tests/conf.d/*
 include examples/*

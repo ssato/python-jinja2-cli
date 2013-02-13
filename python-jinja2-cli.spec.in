@@ -4,13 +4,13 @@
 %define debug_package %{nil}
 
 
-Name:           python-jinja2-cui
+Name:           python-jinja2-cli
 Version:        @VERSION@
 Release:        1%{?dist}
 Summary:        CUI frontend for Jinja2 template engine
 Group:          Development/Tools
 License:        BSD
-URL:            https://github.com/ssato/python-jinja2-cui
+URL:            https://github.com/ssato/python-jinja2-cli
 Source0:        https://github.com/ssato/%{name}/tarball/master/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
@@ -49,12 +49,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc README tests examples
+%doc README.rst tests examples
 %{_bindir}/*
 %{python_sitelib}/*
 
 
 %changelog
+* Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.1-1
+- Renamed project, s/cui/cli/ as it looks much common
+
 * Thu Jan 10 2013 Satoru SATOH <ssato@redhat.com> - 0.0.3.15-1
 - Bug fix in jinja2_cui.dumpvars that unresolved function
 
