@@ -125,7 +125,7 @@ def find_templates(filepath, paths, acc=[]):
 
         ref_templates = [
             R.template_path(f, paths) for f in
-                jinja2.meta.find_referenced_templates(ast) if f
+            jinja2.meta.find_referenced_templates(ast) if f
         ]
 
         for f in ref_templates:
@@ -156,7 +156,7 @@ def find_vars_0(filepath, paths):
         if ast_:
             return [
                 find_attrs(ast_, v) for v in
-                    jinja2.meta.find_undeclared_variables(ast_)
+                jinja2.meta.find_undeclared_variables(ast_)
             ]
         else:
             return []
@@ -172,10 +172,8 @@ def find_vars(filepath, paths):
 
 def option_parser(argv=sys.argv, defaults=None):
     if defaults is None:
-        defaults = dict(
-            template_paths=None, output=None, debug=False,
-            encoding=R._ENCODING,
-        )
+        defaults = dict(template_paths=None, output=None, debug=False,
+                        encoding=R._ENCODING, )
 
     p = optparse.OptionParser(
         "%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0],
@@ -183,11 +181,11 @@ def option_parser(argv=sys.argv, defaults=None):
     p.set_defaults(**defaults)
 
     p.add_option("-T", "--template-paths",
-        help="Colon ':' separated template search paths. " + \
-            "Please note that dir in which given template exists " + \
-            "is always included in the search paths (at the end of " + \
-            "the path list) regardless of this option. " + \
-            "[., dir in which given template file exists]")
+                 help="Colon ':' separated template search paths. "
+                 "Please note that dir in which given template exists "
+                 "is always included in the search paths (at the end of "
+                 "the path list) regardless of this option. "
+                 "[., dir in which given template file exists]")
 
     p.add_option("-o", "--output", help="Output filename [stdout]")
     p.add_option("-E", "--encoding", help="I/O encoding [%default]")
@@ -209,12 +207,9 @@ def main(argv):
     tmpl = args[0]
     paths = R.parse_template_paths(tmpl, options.template_paths)
 
-    vars = ''.join(
-        ('\n'.join(v) + '\n' for v in
-            sorted((['.'.join(e) for e in elt] for elt in
-                find_vars(tmpl, paths)))
-        )
-    )
+    vars = ''.join(('\n'.join(v) + '\n' for v in
+                   sorted((['.'.join(e) for e in elt] for elt in
+                   find_vars(tmpl, paths)))))
     R.write_to_output(options.output, options.encoding, vars)
 
 
