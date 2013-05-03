@@ -43,4 +43,14 @@ Examples
 ==============================
 
 please try `make -C examples` and  see the results:
-"/tmp/jinja2-cli.examples.d/*.out"
+"/tmp/jinja2-cli.examples.d/\*.out"
+
+Hacks
+=======
+
+Test status
+-------------
+
+.. image:: https://api.travis-ci.org/ssato/python-jinja2-cli.png?branch=master
+   :target: https://travis-ci.org/ssato/python-jinja2-cli
+   :alt: Test status
