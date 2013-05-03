@@ -20,4 +20,4 @@ python:
 install:
     - pip install --use-mirrors anyconfig jinja2 pep8
 script:
-    - "./aux/runtest.sh"
+    - "./tests/runtest.sh"
