@@ -86,8 +86,8 @@ def render_s(tmpl_s, ctx, paths=[os.curdir]):
     :param ctx: Context dict needed to instantiate templates
     :param paths: Template search paths
 
-    >>> render_s('a = {{ a }}, b = "{{ b }}"', {'a': 1, 'b': 'bbb'})
-    u'a = 1, b = "bbb"'
+    >>> s = render_s('a = {{ a }}, b = "{{ b }}"', {'a': 1, 'b': 'bbb'})
+    >>> assert s == 'a = 1, b = "bbb"'
     """
     return tmpl_env(paths).from_string(tmpl_s).render(**ctx)
 
@@ -119,7 +119,7 @@ def render(filepath, ctx, paths, ask=False):
     else:
         try:
             return render_impl(filepath, ctx, paths)
-        except TemplateNotFound, mtmpl:
+        except TemplateNotFound as mtmpl:
             if not ask:
                 raise RuntimeError("Template Not found: " + str(mtmpl))
 
