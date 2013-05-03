@@ -162,7 +162,7 @@ def parse_template_paths(tmpl, paths, sep=":"):
             paths = mk_template_paths(tmpl, paths.split(sep))
             assert paths
         except:
-            sys.stderr.write(u"Ignored as invalid form: '%s'\n" % paths)
+            sys.stderr.write("Ignored as invalid form: '%s'\n" % paths)
             paths = mk_template_paths(tmpl, [])
     else:
         paths = mk_template_paths(tmpl, [])
