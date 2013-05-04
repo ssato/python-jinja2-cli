@@ -1,7 +1,5 @@
-#from distutils.core import setup, Command
 from setuptools import setup, Command, find_packages
 
-import datetime
 import glob
 import os
 import sys
@@ -10,10 +8,12 @@ curdir = os.getcwd()
 sys.path.append(curdir)
 
 PACKAGE = "python-jinja2-cli"
-VERSION = "0.0.4.2"
+VERSION = "0.0.4.3"
 
-# daily snapshots:
-#VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")
+# For daily snapshot versioning mode:
+if os.environ.get("_SNAPSHOT_BUILD", None) is not None:
+    import datetime
+    VERSION = VERSION + datetime.datetime.now().strftime(".%Y%m%d")
 
 data_files = []
 

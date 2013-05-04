@@ -53,6 +53,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat May  4 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.3-1
+- Fixed a bug that it wrongly detects file type by file extension:
+  anyconfig.api.load should correctly find out appropriate config loaders by
+  file extensions so that it needs nothing if file type is not specified.
+
 * Wed Feb 13 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.2-1
 - Fixed some output encoding related bugs
 
