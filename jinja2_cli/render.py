@@ -149,7 +149,7 @@ def template_path(filepath, paths):
     return None
 
 
-def parse_template_paths(tmpl, paths, sep=":"):
+def parse_template_paths(tmpl, paths=None, sep=":"):
     """
     Parse template_paths option string and return [template_path].
 
@@ -162,7 +162,7 @@ def parse_template_paths(tmpl, paths, sep=":"):
             paths = mk_template_paths(tmpl, paths.split(sep))
             assert paths
         except:
-            sys.stderr.write("Ignored as invalid form: '%s'\n" % paths)
+            logging.warn("Ignored as invalid form: " + paths)
             paths = mk_template_paths(tmpl, [])
     else:
         paths = mk_template_paths(tmpl, [])
@@ -171,39 +171,34 @@ def parse_template_paths(tmpl, paths, sep=":"):
     return paths
 
 
-def get_fileext(filepath):
-    """
-    >>> get_fileext("a.json")
-    'json'
-    >>> get_fileext("abc")
-    ''
-    """
-    return os.path.splitext(filepath)[1][1:]
-
-
 def parse_filespec(fspec, sep=':', gpat='*'):
     """
     Parse given filespec `fspec` and return [(filetype, filepath)].
+
+    Because anyconfig.api.load should find correct file's type to load by the
+    file extension, this function will not try guessing file's type if not file
+    type is specified explicitly.
 
     :param fspec: filespec
     :param sep: a char separating filetype and filepath in filespec
     :param gpat: a char for glob pattern
 
     >>> parse_filespec("base.json")
+    [('base.json', None)]
+    >>> parse_filespec("json:base.json")
     [('base.json', 'json')]
     >>> parse_filespec("yaml:foo.yaml")
     [('foo.yaml', 'yaml')]
     >>> parse_filespec("yaml:foo.dat")
     [('foo.dat', 'yaml')]
 
-    # FIXME: How to test it?
+    # FIXME: How to test this?
     # >>> parse_filespec("yaml:bar/*.conf")
     # [('bar/a.conf', 'yaml'), ('bar/b.conf', 'yaml')]
 
     TODO: Allow '*' (glob pattern) in filepath when escaped with '\\', etc.
     """
-    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else \
-        (get_fileext(fspec), fspec)
+    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else (None, fspec)
 
     return [(fs, ft) for fs in sorted(glob.glob(fp))] \
         if gpat in fspec else [U.flip(tp)]
@@ -219,11 +214,8 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
     ctx = A.container()  # see also: anyconfig.api
 
     if contexts:
-        # print "contexts: " + str(contexts)
-        cspecs = U.concat(parse_filespec(f) for f in contexts)
-
-        for cspec in cspecs:
-            diff = A.load(*cspec)
+        for fpath, ftype in U.concat(parse_filespec(f) for f in contexts):
+            diff = A.load(fpath, ftype)
             ctx.update(diff)
 
     return ctx
