@@ -8,7 +8,7 @@ curdir = os.getcwd()
 sys.path.append(curdir)
 
 PACKAGE = "python-jinja2-cli"
-VERSION = "0.0.4.3"
+VERSION = "0.0.4.4"
 
 # For daily snapshot versioning mode:
 if os.environ.get("_SNAPSHOT_BUILD", None) is not None:
