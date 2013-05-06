@@ -71,14 +71,15 @@ popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
 %if 0%{?with_python3}
 pushd %{py3dir}
 %{__python3} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
-cp $RPM_BUILD_ROOT%{_bindir}/jinja2-cli $RPM_BUILD_ROOT%{_bindir}/py3jinja2-cli
+mv $RPM_BUILD_ROOT%{_bindir}/jinja2-cli $RPM_BUILD_ROOT%{_bindir}/py3jinja2-cli
 popd
 %endif
+%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -99,6 +100,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon May  6 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.5-1
+- Fixed packaging bug that the shebung line in RPM for python-2.x is wrong
+
 * Mon May  6 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.4-1
 - Make it built and packaged for python-3 version also
 - Some RPM SPEC fixes
