@@ -27,7 +27,7 @@ BuildRequires:  python-setuptools
 BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
-%if %{?rhel}
+%if 0%{?rhel}
 Requires:       python-jinja2-26
 %else
 Requires:       python-jinja2
