@@ -1,5 +1,5 @@
 """
- :copyright: (c) 2012 by Satoru SATOH <ssato@redhat.com>
+ :copyright: (c) 2012, 2013 by Satoru SATOH <ssato@redhat.com>
  :license: BSD-3
 
  Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ def chaincalls(callables, x):
 
 
 def normpath(path):
-    """Normalize given path.
+    """Normalize given path in various different forms.
 
     >>> normpath("/tmp/../etc/hosts")
     '/etc/hosts'

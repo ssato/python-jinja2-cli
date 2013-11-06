@@ -2,6 +2,8 @@
 # Copyright (C). 2011, 2012 Satoru SATOH <ssato at redhat.com>
 #
 import jinja2_cli.utils as U
+import os.path
+import os
 import unittest
 
 
@@ -23,6 +25,14 @@ class Test_00_functions(unittest.TestCase):
     def test_04_normpath(self):
         self.assertEquals(U.normpath("/tmp/../etc/hosts"), "/etc/hosts")
         self.assertEquals(U.normpath("~root/t"), "/root/t")
+
+    def test_04_normpath__relative(self):
+        #curdir = os.path.dirname(__file__)
+        curdir = os.curdir
+        relpath = "./a/b/c.txt"
+
+        self.assertEquals(U.normpath(relpath),
+                          U.normpath(os.path.join(curdir, relpath)))
 
     def test_05_flip(self):
         self.assertEquals(U.flip((1, 3)), (3, 1))
