@@ -4,6 +4,7 @@
 
     Compiles and render Jinja2-based template files.
 
+    :copyright: (c) 2012 - 2014 Red Hat, Inc.
     :copyright: (c) 2012 by Satoru SATOH <ssato@redhat.com>
     :license: BSD-3
 
@@ -222,41 +223,8 @@ def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
     return ctx
 
 
-def option_parser(argv=sys.argv):
-    defaults = dict(
-        template_paths=None, output=None, contexts=[], debug=False,
-        encoding=_ENCODING, werror=False, ask=False,
-    )
-
-    p = optparse.OptionParser(
-        "%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0],
-    )
-    p.set_defaults(**defaults)
-
-    p.add_option("-T", "--template-paths",
-                 help="Colon ':' separated template search paths. "
-                 "Please note that dir in which given template exists "
-                 "is always included in the search paths (at the end of "
-                 "the path list) regardless of this option. "
-                 "[., dir in which given template file exists]")
-    p.add_option("-C", "--contexts", action="append",
-                 help="Specify file path and optionally its filetype, to "
-                 "provides context data to instantiate templates. "
-                 " The option argument's format is "
-                 " [type:]<file_name_or_path_or_glob_pattern>"
-                 " ex. -C json:common.json -C ./specific.yaml -C "
-                 "yaml:test.dat, -C yaml:/etc/foo.d/*.conf")
-    p.add_option("-o", "--output", help="Output filename [stdout]")
-    p.add_option("-E", "--encoding", help="I/O encoding [%default]")
-    p.add_option("-D", "--debug", action="store_true", help="Debug mode")
-    p.add_option("-W", "--werror", action="store_true",
-                 help="Exit on warnings if True such like -Werror optoin "
-                 "for gcc")
-
-    return p
-
-
-def write_to_output(output=None, encoding="utf-8", content=""):
+def renderto(tmpl, ctx, paths, output=None, encoding=_ENCODING, ask=True):
+    content = render(tmpl, ctx, paths, ask)
     if output and not output == '-':
         outdir = os.path.dirname(output)
         if not os.path.exists(outdir):
@@ -267,8 +235,33 @@ def write_to_output(output=None, encoding="utf-8", content=""):
         codecs.getwriter(encoding)(sys.stdout).write(content)
 
 
-def renderto(tmpl, ctx, paths, output=None, encoding=_ENCODING, ask=True):
-    write_to_output(output, encoding, render(tmpl, ctx, paths, ask))
+def option_parser(argv=sys.argv):
+    defaults = dict(template_paths=None, output=None, contexts=[], debug=False,
+                    encoding=_ENCODING, werror=False, ask=False)
+
+    p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0])
+    p.set_defaults(**defaults)
+
+    p.add_option("-T", "--template-paths",
+                 help="Colon ':' separated template search paths. "
+                      "Please note that dir in which given template exists "
+                      "is always included in the search paths (at the end of "
+                      "the path list) regardless of this option. "
+                      "[., dir in which given template file exists]")
+    p.add_option("-C", "--contexts", action="append",
+                 help="Specify file path and optionally its filetype, to "
+                      "provides context data to instantiate templates. "
+                      " The option argument's format is "
+                      " [type:]<file_name_or_path_or_glob_pattern>"
+                      " ex. -C json:common.json -C ./specific.yaml -C "
+                      "yaml:test.dat, -C yaml:/etc/foo.d/*.conf")
+    p.add_option("-o", "--output", help="Output filename [stdout]")
+    p.add_option("-E", "--encoding", help="I/O encoding [%default]")
+    p.add_option("-D", "--debug", action="store_true", help="Debug mode")
+    p.add_option("-W", "--werror", action="store_true",
+                 help="Exit on warnings if True such as -Werror optoin "
+                      "in gcc")
+    return p
 
 
 def main(argv):
@@ -279,15 +272,12 @@ def main(argv):
         p.print_help()
         sys.exit(0)
 
-    logging.basicConfig(
-        format="[%(levelname)s] %(message)s",
-        level=(DEBUG if options.debug else INFO),
-    )
+    logging.basicConfig(format="[%(levelname)s] %(message)s",
+                        level=(DEBUG if options.debug else INFO))
 
     tmpl = args[0]
-    ctx = parse_and_load_contexts(
-        options.contexts, options.encoding, options.werror
-    )
+    ctx = parse_and_load_contexts(options.contexts, options.encoding,
+                                  options.werror)
     paths = parse_template_paths(tmpl, options.template_paths)
     renderto(tmpl, ctx, paths, options.output, options.encoding)
 
