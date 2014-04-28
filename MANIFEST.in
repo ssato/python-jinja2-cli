@@ -4,6 +4,7 @@ include python-jinja2-cli.spec.in
 include setup.py
 recursive-include jinja2_cli *.py
 include tools/*
+include aux/*
 include tests/*
 include tests/conf.d/*
 include examples/*
