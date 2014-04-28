@@ -38,24 +38,17 @@
 from jinja2.exceptions import TemplateNotFound
 
 import jinja2_cli.utils as U
-
-import anyconfig.api as A
 import codecs
-import glob
 import jinja2
-import locale
 import logging
 import optparse
 import os.path
 import os
 import sys
 
-from logging import DEBUG, INFO
 
-
-_ENCODING = locale.getdefaultlocale()[1]
-sys.stdout = codecs.getwriter(_ENCODING)(sys.stdout)
-sys.stderr = codecs.getwriter(_ENCODING)(sys.stderr)
+sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
+sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
 open = codecs.open
 
 
@@ -173,57 +166,7 @@ def parse_template_paths(tmpl, paths=None, sep=":"):
     return paths
 
 
-def parse_filespec(fspec, sep=':', gpat='*'):
-    """
-    Parse given filespec `fspec` and return [(filetype, filepath)].
-
-    Because anyconfig.api.load should find correct file's type to load by the
-    file extension, this function will not try guessing file's type if not file
-    type is specified explicitly.
-
-    :param fspec: filespec
-    :param sep: a char separating filetype and filepath in filespec
-    :param gpat: a char for glob pattern
-
-    >>> parse_filespec("base.json")
-    [('base.json', None)]
-    >>> parse_filespec("json:base.json")
-    [('base.json', 'json')]
-    >>> parse_filespec("yaml:foo.yaml")
-    [('foo.yaml', 'yaml')]
-    >>> parse_filespec("yaml:foo.dat")
-    [('foo.dat', 'yaml')]
-
-    # FIXME: How to test this?
-    # >>> parse_filespec("yaml:bar/*.conf")
-    # [('bar/a.conf', 'yaml'), ('bar/b.conf', 'yaml')]
-
-    TODO: Allow '*' (glob pattern) in filepath when escaped with '\\', etc.
-    """
-    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else (None, fspec)
-
-    return [(fs, ft) for fs in sorted(glob.glob(fp))] \
-        if gpat in fspec else [U.flip(tp)]
-
-
-def parse_and_load_contexts(contexts, enc=_ENCODING, werr=False):
-    """
-    :param contexts: list of context file specs
-    :param enc: Input encoding of context files (dummy param)
-    :param werr: Exit immediately if True and any errors occurrs
-        while loading context files
-    """
-    ctx = A.container()  # see also: anyconfig.api
-
-    if contexts:
-        for fpath, ftype in U.concat(parse_filespec(f) for f in contexts):
-            diff = A.load(fpath, ftype)
-            ctx.update(diff)
-
-    return ctx
-
-
-def renderto(tmpl, ctx, paths, output=None, encoding=_ENCODING, ask=True):
+def renderto(tmpl, ctx, paths, output=None, encoding=U.ENCODING, ask=True):
     content = render(tmpl, ctx, paths, ask)
     if output and not output == '-':
         outdir = os.path.dirname(output)
@@ -237,7 +180,7 @@ def renderto(tmpl, ctx, paths, output=None, encoding=_ENCODING, ask=True):
 
 def option_parser(argv=sys.argv):
     defaults = dict(template_paths=None, output=None, contexts=[], debug=False,
-                    encoding=_ENCODING, werror=False, ask=False)
+                    encoding=U.ENCODING, werror=False, ask=False)
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0])
     p.set_defaults(**defaults)
@@ -273,11 +216,12 @@ def main(argv):
         sys.exit(0)
 
     logging.basicConfig(format="[%(levelname)s] %(message)s",
-                        level=(DEBUG if options.debug else INFO))
+                        level=(logging.DEBUG if options.debug else
+                               logging.INFO))
 
     tmpl = args[0]
-    ctx = parse_and_load_contexts(options.contexts, options.encoding,
-                                  options.werror)
+    ctx = U.parse_and_load_contexts(options.contexts, options.encoding,
+                                    options.werror)
     paths = parse_template_paths(tmpl, options.template_paths)
     renderto(tmpl, ctx, paths, options.output, options.encoding)
 

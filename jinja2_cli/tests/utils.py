@@ -27,7 +27,6 @@ class Test_00_functions(unittest.TestCase):
         self.assertEquals(U.normpath("~root/t"), "/root/t")
 
     def test_04_normpath__relative(self):
-        #curdir = os.path.dirname(__file__)
         curdir = os.curdir
         relpath = "./a/b/c.txt"
 
@@ -50,6 +49,13 @@ class Test_00_functions(unittest.TestCase):
         self.assertEquals(
             U.concat((i, i * 2) for i in range(3)), [0, 0, 1, 2, 2, 4]
         )
+
+    def test_40_parse_filespec__w_type(self):
+        self.assertEquals(U.parse_filespec("json:a.json"),
+                          [("a.json", "json")])
+
+    def test_41_parse_filespec__wo_type(self):
+        self.assertEquals(U.parse_filespec("a.json"), [("a.json", None)])
 
 
 if __name__ == '__main__':

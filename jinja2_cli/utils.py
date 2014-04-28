@@ -26,13 +26,15 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import codecs
+import glob
 import itertools
 import locale
 import logging
 import os.path
 import sys
 
-from logging import DEBUG, INFO
+
+ENCODING = locale.getdefaultlocale()[1]
 
 try:
     chain_from_iterable = itertools.chain.from_iterable
@@ -44,6 +46,23 @@ except AttributeError:
                 yield element
 
     chain_from_iterable = _from_iterable
+
+try:
+    from anyconfig.api import container, load
+except ImportError:
+    container = dict
+
+    try:
+        import json
+    except ImportError:
+        try:
+            import simplejson as json
+        except ImportError:
+            sys.stderr.write("Could not load any json module! Aborting...\n")
+            sys.exit(-1)
+
+    def load(filepath, _ftype):
+        return json.load(open(filepath))
 
 
 def uniq(xs):
@@ -114,5 +133,54 @@ def concat(xss):
     """
     return list(chain_from_iterable(xs for xs in xss))
 
+
+def parse_filespec(fspec, sep=':', gpat='*'):
+    """
+    Parse given filespec `fspec` and return [(filetype, filepath)].
+
+    Because anyconfig.api.load should find correct file's type to load by the
+    file extension, this function will not try guessing file's type if not file
+    type is specified explicitly.
+
+    :param fspec: filespec
+    :param sep: a char separating filetype and filepath in filespec
+    :param gpat: a char for glob pattern
+
+    >>> parse_filespec("base.json")
+    [('base.json', None)]
+    >>> parse_filespec("json:base.json")
+    [('base.json', 'json')]
+    >>> parse_filespec("yaml:foo.yaml")
+    [('foo.yaml', 'yaml')]
+    >>> parse_filespec("yaml:foo.dat")
+    [('foo.dat', 'yaml')]
+
+    # FIXME: How to test this?
+    # >>> parse_filespec("yaml:bar/*.conf")
+    # [('bar/a.conf', 'yaml'), ('bar/b.conf', 'yaml')]
+
+    TODO: Allow '*' (glob pattern) in filepath when escaped with '\\', etc.
+    """
+    tp = (ft, fp) = tuple(fspec.split(sep)) if sep in fspec else (None, fspec)
+
+    return [(fs, ft) for fs in sorted(glob.glob(fp))] \
+        if gpat in fspec else [flip(tp)]
+
+
+def parse_and_load_contexts(contexts, enc=ENCODING, werr=False):
+    """
+    :param contexts: list of context file specs
+    :param enc: Input encoding of context files (dummy param)
+    :param werr: Exit immediately if True and any errors occurrs
+        while loading context files
+    """
+    ctx = container()
+
+    if contexts:
+        for fpath, ftype in concat(parse_filespec(f) for f in contexts):
+            diff = load(fpath, ftype)
+            ctx.update(diff)
+
+    return ctx
 
 # vim:sw=4:ts=4:et:

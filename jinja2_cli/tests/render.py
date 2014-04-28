@@ -33,13 +33,6 @@ class Test_00_pure_functions(unittest.TestCase):
         self.assertEquals(R.parse_template_paths("/a/b/c.yml", "/a/d:/a/e"),
                           ["/a/d", "/a/e", "/a/b"])
 
-    def test_40_parse_filespec__w_type(self):
-        self.assertEquals(R.parse_filespec("json:a.json"),
-                          [("a.json", "json")])
-
-    def test_41_parse_filespec__wo_type(self):
-        self.assertEquals(R.parse_filespec("a.json"), [("a.json", None)])
-
 
 class Test_10_effectful_functions(unittest.TestCase):
 
