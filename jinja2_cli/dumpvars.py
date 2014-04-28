@@ -33,8 +33,10 @@
 import jinja2_cli.render as R
 import jinja2_cli.utils as U
 import jinja2.meta
+import codecs
 import logging
 import optparse
+import os
 import sys
 
 from functools import reduce as foldl
@@ -149,10 +151,10 @@ def find_vars_0(filepath, paths):
     :return:  [(template_abs_path, [var])]
     """
     filepath = R.template_path(filepath, paths)
-    ast = R.get_ast(filepath, paths)
+    ast = get_ast(filepath, paths)
 
     def find_undecls_0(fpath, paths=paths):
-        ast_ = R.get_ast(fpath, paths)
+        ast_ = get_ast(fpath, paths)
         if ast_:
             return [
                 find_attrs(ast_, v) for v in
@@ -170,10 +172,21 @@ def find_vars(filepath, paths):
     )
 
 
+def write_to_output(output, content, encoding=U.ENCODING):
+    if output and not output == '-':
+        outdir = os.path.dirname(output)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        open(output, "w", encoding).write(content)
+    else:
+        codecs.getwriter(encoding)(sys.stdout).write(content)
+
+
 def option_parser(argv=sys.argv, defaults=None):
     if defaults is None:
         defaults = dict(template_paths=None, output=None, debug=False,
-                        encoding=R._ENCODING, )
+                        encoding=U.ENCODING, )
 
     p = optparse.OptionParser(
         "%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0],
@@ -208,9 +221,9 @@ def main(argv):
     paths = R.parse_template_paths(tmpl, options.template_paths)
 
     vars = ''.join(('\n'.join(v) + '\n' for v in
-                   sorted((['.'.join(e) for e in elt] for elt in
-                   find_vars(tmpl, paths)))))
-    R.write_to_output(options.output, options.encoding, vars)
+                    sorted((['.'.join(e) for e in elt] for elt in
+                           find_vars(tmpl, paths)))))
+    write_to_output(options.output, vars, options.encoding)
 
 
 if __name__ == '__main__':
