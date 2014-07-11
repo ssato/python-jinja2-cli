@@ -47,6 +47,8 @@ import os
 import sys
 
 
+reload(sys)
+sys.setdefaultencoding(U.ENCODING.lower())
 sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
 open = codecs.open
