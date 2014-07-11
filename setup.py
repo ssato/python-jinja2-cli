@@ -69,20 +69,18 @@ class RpmCommand(SrpmCommand):
 
 
 setup(name=PACKAGE,
-    version=VERSION,
-    description="A CUI frontend for Jinja2 template engine.",
-    author="Satoru SATOH",
-    author_email="ssato@redhat.com",
-    license="BSD",
-    url="https://github.com/ssato/python-jinja2-cli",
-    packages=find_packages(),
-    scripts=glob.glob("tools/*"),
-    data_files=data_files,
-    cmdclass={
-        "srpm": SrpmCommand,
-        "rpm":  RpmCommand,
-    },
-    #test_suite='nose.collector',
-)
+      version=VERSION,
+      description="A CUI frontend for Jinja2 template engine.",
+      author="Satoru SATOH",
+      author_email="ssato@redhat.com",
+      license="BSD",
+      url="https://github.com/ssato/python-jinja2-cli",
+      packages=find_packages(),
+      scripts=glob.glob("tools/*"),
+      data_files=data_files,
+      cmdclass={
+          "srpm": SrpmCommand,
+          "rpm":  RpmCommand,
+      },)
 
 # vim:sw=4:ts=4:et:

@@ -47,8 +47,11 @@ import os
 import sys
 
 
+# pylint: disable=no-member
 reload(sys)
 sys.setdefaultencoding(U.ENCODING.lower())
+# pylint: enable=no-member
+
 sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
 open = codecs.open

@@ -1,5 +1,7 @@
 #! /usr/bin/python -tt
-import sys,json,yaml
+import sys
+import json
+import yaml
 
 try:
     inp = sys.argv[1]

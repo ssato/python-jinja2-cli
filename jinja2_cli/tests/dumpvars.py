@@ -1,6 +1,6 @@
 import jinja2_cli.dumpvars as D
 import unittest
-from jinja2 import Environment, meta
+from jinja2 import Environment
 
 
 class Test_dumpvar(unittest.TestCase):

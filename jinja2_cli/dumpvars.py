@@ -151,7 +151,6 @@ def find_vars_0(filepath, paths):
     :return:  [(template_abs_path, [var])]
     """
     filepath = R.template_path(filepath, paths)
-    ast = get_ast(filepath, paths)
 
     def find_undecls_0(fpath, paths=paths):
         ast_ = get_ast(fpath, paths)

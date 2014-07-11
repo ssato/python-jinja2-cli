@@ -104,6 +104,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jul 12 2014 Satoru SATOH <ssato@redhat.com> - 0.0.4.6-1
+- Added quick hack to avoid 'UnicodeDecodeError'
+- Experimental fix to resolve dependencies in RHEL 6
+- Add pylint and lFixed some pylint errors and warnings
+
 * Mon May  6 2013 Satoru SATOH <ssato@redhat.com> - 0.0.4.5-1
 - Fixed packaging bug that the shebung line in RPM for python-2.x is wrong
 
