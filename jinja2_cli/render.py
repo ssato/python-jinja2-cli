@@ -58,6 +58,11 @@ sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
 open = codecs.open
 
+try:
+    raw_input
+except NameError:
+    raw_input = input
+
 
 def mk_template_paths(filepath, template_paths=[]):
     """
