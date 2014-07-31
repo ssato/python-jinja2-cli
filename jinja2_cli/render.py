@@ -58,10 +58,12 @@ sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
 open = codecs.open
 
+# pylint: disable=undefined-variable
 try:
     raw_input
-except NameError:
+except NameError:  # python 3.x
     raw_input = input
+# pylint: enable=undefined-variable
 
 
 def mk_template_paths(filepath, template_paths=[]):
