@@ -47,10 +47,12 @@ import os
 import sys
 
 
+# Hack for python 2.x. see also: http://bit.ly/1xBNxRc.
 # pylint: disable=no-member
-reload(sys)
-sys.setdefaultencoding(U.ENCODING.lower())
+# reload(sys)
+# sys.setdefaultencoding(U.ENCODING.lower())
 # pylint: enable=no-member
+os.environ.setdefault("PYTHONIOENCODING", U.ENCODING)
 
 sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
 sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
