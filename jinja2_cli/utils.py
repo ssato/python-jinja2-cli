@@ -30,6 +30,10 @@ except ImportError:
 
 
 def get_locale_sensitive_stdout(encoding=ENCODING):
+    """
+    :param encoding: Chart sets encoding
+    :return: sys.stdout can output encoded strings
+    """
     return codecs.getwriter(encoding)(sys.stdout)
 
 
@@ -53,6 +57,9 @@ def chaincalls(callables, x):
     """
     :param callables: callable objects to apply to x in this order
     :param x: Object to apply callables
+
+    >>> chaincalls([lambda a: a + 1, lambda b: b + 2], 0)
+    3
     """
     for c in callables:
         assert callable(c), "%s is not callable object!" % str(c)
@@ -78,6 +85,12 @@ def normpath(path):
 
 
 def flip(xy):
+    """
+    :param xy: A tuple of pair items
+
+    >>> flip((1, 2))
+    (2, 1)
+    """
     (x, y) = xy
     return (y, x)
 
