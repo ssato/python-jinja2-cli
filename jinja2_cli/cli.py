@@ -11,7 +11,7 @@ import logging
 import optparse
 import sys
 
-from . import utils, render
+from . import utils, render, dumpvars
 
 
 def parse_template_paths(tmpl, paths=None, sep=":"):
@@ -37,8 +37,8 @@ def parse_template_paths(tmpl, paths=None, sep=":"):
 
 
 def option_parser(argv=sys.argv):
-    defaults = dict(template_paths=None, output=None, contexts=[], debug=False,
-                    werror=False, ask=False)
+    defaults = dict(template_paths=None, output=None, contexts=[],
+                    dumpvars=False, debug=False, werror=False, ask=False)
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0])
     p.set_defaults(**defaults)
@@ -57,6 +57,8 @@ def option_parser(argv=sys.argv):
                       " ex. -C json:common.json -C ./specific.yaml -C "
                       "yaml:test.dat, -C yaml:/etc/foo.d/*.conf")
     p.add_option("-o", "--output", help="Output filename [stdout]")
+    p.add_option("", "--dumpvars", action="store_true",
+                 help="Dump template variables instead of compile it")
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
     p.add_option("-W", "--werror", action="store_true",
                  help="Exit on warnings if True such as -Werror optoin "
@@ -77,9 +79,13 @@ def main(argv):
                                logging.INFO))
 
     tmpl = args[0]
-    ctx = utils.parse_and_load_contexts(options.contexts, options.werror)
     paths = parse_template_paths(tmpl, options.template_paths)
-    render.renderto(tmpl, ctx, paths, options.output)
+
+    if options.dumpvars:
+        dumpvars.dumpvars(tmpl, options.output, paths)
+    else:
+        ctx = utils.parse_and_load_contexts(options.contexts, options.werror)
+        render.renderto(tmpl, ctx, paths, options.output)
 
 
 if __name__ == '__main__':

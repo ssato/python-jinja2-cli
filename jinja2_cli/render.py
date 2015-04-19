@@ -118,13 +118,6 @@ def template_path(filepath, paths):
 
 def renderto(tmpl, ctx, paths, output=None, ask=True):
     content = render(tmpl, ctx, paths, ask)
-    if output and not output == '-':
-        outdir = os.path.dirname(output)
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
-
-        compat.copen(output, "w").write(content)
-    else:
-        utils.get_locale_sensitive_stdout().write(content)
+    utils.write_to_output(content, output)
 
 # vim:sw=4:ts=4:et:
