@@ -112,10 +112,8 @@ def find_templates(filepath, paths, acc=[]):
         if filepath not in acc:
             acc.append(filepath)  # Add self.
 
-        ref_templates = [
-            render.template_path(f, paths) for f in
-            jinja2.meta.find_referenced_templates(ast) if f
-        ]
+        ref_templates = [render.template_path(f, paths) for f in
+                         jinja2.meta.find_referenced_templates(ast) if f]
 
         for f in ref_templates:
             if f not in acc:
@@ -142,10 +140,8 @@ def find_vars_0(filepath, paths):
     def find_undecls_0(fpath, paths=paths):
         ast_ = get_ast(fpath, paths)
         if ast_:
-            return [
-                find_attrs(ast_, v) for v in
-                jinja2.meta.find_undeclared_variables(ast_)
-            ]
+            return [find_attrs(ast_, v) for v in
+                    jinja2.meta.find_undeclared_variables(ast_)]
         else:
             return []
 
@@ -153,9 +149,9 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    return utils.uniq(
-        foldl(listplus, (vs[1] for vs in find_vars_0(filepath, paths)), [])
-    )
+    return utils.uniq(foldl(listplus,
+                            (vs[1] for vs in find_vars_0(filepath, paths)),
+                            []))
 
 
 def dumpvars(template, output=None, paths=[]):
