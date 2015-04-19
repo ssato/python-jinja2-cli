@@ -1,49 +1,13 @@
 """
- :copyright: (c) 2012, 2013 by Satoru SATOH <ssato@redhat.com>
- :license: BSD-3
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
-   * Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-   * Neither the name of the author nor the names of its contributors may
-     be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+:copyright: (c) 2012 - 2015 by Satoru SATOH <ssato@redhat.com>
+:license: BSD-3
 """
+from __future__ import absolute_import
+
 import glob
-import itertools
-import locale
 import os.path
-import sys
 
-
-ENCODING = locale.getdefaultlocale()[1]
-
-try:
-    chain_from_iterable = itertools.chain.from_iterable
-except AttributeError:
-    # Borrowed from library doc, 9.7.1 Itertools functions:
-    def _from_iterable(iterables):
-        for it in iterables:
-            for element in it:
-                yield element
-
-    chain_from_iterable = _from_iterable
+from .compat import ENCODING, from_iterable
 
 try:
     from anyconfig.api import container, load
@@ -56,8 +20,8 @@ except ImportError:
         try:
             import simplejson as json
         except ImportError:
-            sys.stderr.write("Could not load any json module! Aborting...\n")
-            sys.exit(-1)
+            raise ("Could not import any json module to load contexts!"
+                   " Aborting...")
 
     def load(filepath, _ftype):
         return json.load(open(filepath))
@@ -129,7 +93,7 @@ def concat(xss):
     >>> concat((i, i*2) for i in range(3))
     [0, 0, 1, 2, 2, 4]
     """
-    return list(chain_from_iterable(xs for xs in xss))
+    return list(from_iterable(xs for xs in xss))
 
 
 def parse_filespec(fspec, sep=':', gpat='*'):
