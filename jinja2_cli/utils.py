@@ -4,8 +4,10 @@
 """
 from __future__ import absolute_import
 
+import codecs
 import glob
 import os.path
+import sys
 
 from .compat import ENCODING, from_iterable
 
@@ -25,6 +27,10 @@ except ImportError:
 
     def load(filepath, _ftype):
         return json.load(open(filepath))
+
+
+def get_locale_sensitive_stdout(encoding=ENCODING):
+    return codecs.getwriter(encoding)(sys.stdout)
 
 
 def uniq(xs):
