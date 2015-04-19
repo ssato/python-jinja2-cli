@@ -104,6 +104,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Apr 19 2015 Satoru SATOH <ssato@redhat.com> - 0.0.4.999-1
+- Re-organized module internals
+- Merge two CLI function (render and dumpvars) into one
+- Refactoring, many additional test cases, cleanups and bug fixes
+- Bump up the version and change versioning scheme to follow python standard
+
 * Sat Jul 12 2014 Satoru SATOH <ssato@redhat.com> - 0.0.4.6-1
 - Added quick hack to avoid 'UnicodeDecodeError'
 - Experimental fix to resolve dependencies in RHEL 6
