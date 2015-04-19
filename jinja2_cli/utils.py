@@ -37,6 +37,14 @@ def get_locale_sensitive_stdout(encoding=ENCODING):
     return codecs.getwriter(encoding)(sys.stdout)
 
 
+def get_locale_sensitive_stdin(encoding=ENCODING):
+    """
+    :param encoding: Chart sets encoding
+    :return: sys.stdout can output encoded strings
+    """
+    return codecs.getreader(encoding)(sys.stdin)
+
+
 def uniq(xs):
     """Remove duplicates in given list with its order kept.
 

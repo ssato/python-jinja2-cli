@@ -27,14 +27,6 @@ class Test_00_pure_functions(unittest.TestCase):
         self.assertEquals(TT.render_s(tmpl_s, {'a': 1, 'b': 'bbb'}),
                           'a = 1, b = "bbb"')
 
-    def test_30_parse_template_paths__wo_paths(self):
-        self.assertEquals(TT.parse_template_paths("/a/b/c.yml"),
-                          [os.curdir, "/a/b"])
-
-    def test_31_parse_template_paths__w_paths(self):
-        self.assertEquals(TT.parse_template_paths("/a/b/c.yml", "/a/d:/a/e"),
-                          ["/a/d", "/a/e", "/a/b"])
-
 
 class Test_10_effectful_functions(unittest.TestCase):
 
