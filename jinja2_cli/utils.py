@@ -135,12 +135,12 @@ def parse_filespec(fspec, sep=':', gpat='*'):
         if gpat in fspec else [flip(tp)]
 
 
-def parse_and_load_contexts(contexts, enc=ENCODING, werr=False):
+def parse_and_load_contexts(contexts, werr=False, enc=ENCODING):
     """
     :param contexts: list of context file specs
-    :param enc: Input encoding of context files (dummy param)
     :param werr: Exit immediately if True and any errors occurrs
         while loading context files
+    :param enc: Input encoding of context files (dummy param)
     """
     ctx = container()
 
