@@ -79,7 +79,7 @@ rm -rf $RPM_BUILD_ROOT
 %if 0%{?with_python3}
 pushd %{py3dir}
 %{__python3} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
-mv $RPM_BUILD_ROOT%{_bindir}/jinja2_cli $RPM_BUILD_ROOT%{_bindir}/py3jinja2_cli
+mv $RPM_BUILD_ROOT%{_bindir}/jinja2-cli $RPM_BUILD_ROOT%{_bindir}/py3jinja2-cli
 popd
 %endif
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
@@ -92,14 +92,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc README.rst tests examples
-%{_bindir}/jinja2_cli
+%{_bindir}/jinja2-cli
 %{python_sitelib}/*
 
 %if 0%{?with_python3}
 %files -n python3-%{pkgname}
 %defattr(644,root,root,755)
 %doc README.rst tests examples
-%attr(755,root,root) %{_bindir}/py3jinja2_cli
+%attr(755,root,root) %{_bindir}/py3jinja2-cli
 %{python3_sitelib}/*
 %endif
 
