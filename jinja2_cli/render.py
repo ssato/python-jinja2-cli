@@ -4,41 +4,17 @@
 
     Compiles and render Jinja2-based template files.
 
-    :copyright: (c) 2012 - 2014 Red Hat, Inc.
+    :copyright: (c) 2012 - 2015 Red Hat, Inc.
     :copyright: (c) 2012 by Satoru SATOH <ssato@redhat.com>
     :license: BSD-3
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
-   * Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-   * Neither the name of the author nor the names of its contributors may
-     be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  Requirements: python-jinja2, python-simplejson (if python < 2.6) and PyYAML
  References: http://jinja.pocoo.org,
     especially http://jinja.pocoo.org/docs/api/#basics
 """
-from jinja2.exceptions import TemplateNotFound
+from __future__ import absolute_import
 
-import jinja2_cli.utils as U
-import codecs
+import jinja2.exceptions
 import jinja2
 import logging
 import optparse
@@ -46,24 +22,7 @@ import os.path
 import os
 import sys
 
-
-# Hack for python 2.x. see also: http://bit.ly/1xBNxRc.
-# pylint: disable=no-member
-# reload(sys)
-# sys.setdefaultencoding(U.ENCODING.lower())
-# pylint: enable=no-member
-os.environ.setdefault("PYTHONIOENCODING", U.ENCODING)
-
-sys.stdout = codecs.getwriter(U.ENCODING)(sys.stdout)
-sys.stderr = codecs.getwriter(U.ENCODING)(sys.stderr)
-open = codecs.open
-
-# pylint: disable=undefined-variable
-try:
-    raw_input
-except NameError:  # python 3.x
-    raw_input = input
-# pylint: enable=undefined-variable
+from . import compat, utils
 
 
 def mk_template_paths(filepath, template_paths=[]):
@@ -73,10 +32,9 @@ def mk_template_paths(filepath, template_paths=[]):
     """
     tmpldir = os.path.abspath(os.path.dirname(filepath))
     if template_paths:
-        return U.uniq(template_paths + [tmpldir])
+        return utils.uniq(template_paths + [tmpldir])
     else:
-        # default:
-        return [os.curdir, tmpldir]
+        return [os.curdir, tmpldir]  # default:
 
 
 def tmpl_env(paths):
@@ -127,16 +85,17 @@ def render(filepath, ctx, paths, ask=False):
     else:
         try:
             return render_impl(filepath, ctx, paths)
-        except TemplateNotFound as mtmpl:
+        except jinja2.exceptions.TemplateNotFound as mtmpl:
             if not ask:
-                raise RuntimeError("Template Not found: " + str(mtmpl))
+                raise RuntimeError("Template '%s' Not found: %s" %
+                                   (filepath, str(mtmpl)))
 
-            usr_tmpl = raw_input(
+            usr_tmpl = compat.raw_input(
                 "\n*** Missing template '%s'. "
                 "Please enter absolute or relative path starting from "
                 "'.' to the template file: " % mtmpl
             )
-            usr_tmpl = U.normpath(usr_tmpl.strip())
+            usr_tmpl = utils.normpath(usr_tmpl.strip())
             usr_tmpldir = os.path.dirname(usr_tmpl)
 
             return render_impl(usr_tmpl, ctx, paths + [usr_tmpldir])
@@ -154,7 +113,7 @@ def template_path(filepath, paths):
         if os.path.exists(candidate):
             return candidate
 
-    logging.warn("Could not find template=%s in paths=%s" % (filepath, paths))
+    logging.warn("Could not find template=%s in paths=%s", filepath, paths)
     return None
 
 
@@ -171,30 +130,30 @@ def parse_template_paths(tmpl, paths=None, sep=":"):
             paths = mk_template_paths(tmpl, paths.split(sep))
             assert paths
         except:
-            logging.warn("Ignored as invalid form: " + paths)
+            logging.warn("Ignored as invalid form: %s", paths)
             paths = mk_template_paths(tmpl, [])
     else:
         paths = mk_template_paths(tmpl, [])
 
-    logging.debug("Template search paths: " + str(paths))
+    logging.debug("Template search paths: %s", str(paths))
     return paths
 
 
-def renderto(tmpl, ctx, paths, output=None, encoding=U.ENCODING, ask=True):
+def renderto(tmpl, ctx, paths, output=None, ask=True):
     content = render(tmpl, ctx, paths, ask)
     if output and not output == '-':
         outdir = os.path.dirname(output)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        open(output, "w", encoding).write(content)
+        compat.copen(output, "w").write(content)
     else:
-        codecs.getwriter(encoding)(sys.stdout).write(content)
+        utils.get_locale_sensitive_stdout().write(content)
 
 
 def option_parser(argv=sys.argv):
     defaults = dict(template_paths=None, output=None, contexts=[], debug=False,
-                    encoding=U.ENCODING, werror=False, ask=False)
+                    werror=False, ask=False)
 
     p = optparse.OptionParser("%prog [OPTION ...] TEMPLATE_FILE", prog=argv[0])
     p.set_defaults(**defaults)
@@ -213,7 +172,6 @@ def option_parser(argv=sys.argv):
                       " ex. -C json:common.json -C ./specific.yaml -C "
                       "yaml:test.dat, -C yaml:/etc/foo.d/*.conf")
     p.add_option("-o", "--output", help="Output filename [stdout]")
-    p.add_option("-E", "--encoding", help="I/O encoding [%default]")
     p.add_option("-D", "--debug", action="store_true", help="Debug mode")
     p.add_option("-W", "--werror", action="store_true",
                  help="Exit on warnings if True such as -Werror optoin "
@@ -234,10 +192,9 @@ def main(argv):
                                logging.INFO))
 
     tmpl = args[0]
-    ctx = U.parse_and_load_contexts(options.contexts, options.encoding,
-                                    options.werror)
+    ctx = utils.parse_and_load_contexts(options.contexts, options.werror)
     paths = parse_template_paths(tmpl, options.template_paths)
-    renderto(tmpl, ctx, paths, options.output, options.encoding)
+    renderto(tmpl, ctx, paths, options.output)
 
 
 if __name__ == '__main__':
