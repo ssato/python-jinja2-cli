@@ -2,7 +2,6 @@ WORKDIR	?= /tmp/jinja2-cli.examples.d
 PYTHONPATH ?= $(PWD)
 EXAMPLESDIR ?= $(PYTHONPATH)/examples
 
-#render	?= jinja2-cli -D
 render	?= PYTHONPATH=$(PWD) python $(PYTHONPATH)/tools/jinja2-cli
 
 # quick hack:
@@ -19,15 +18,13 @@ $(WORKDIR)/5_multi_templates_and_multi_configs.out \
 $(WORKDIR)/6_multi_templates_and_multi_configs.out \
 $(NULL)
 
+
 all: $(objs)
-
-
 
 $(WORKDIR):
 	mkdir -p $@
 
 $(objs): $(WORKDIR)
-
 
 $(WORKDIR)/0_single_template_and_config.out: $(EXAMPLESDIR)/a.yaml
 $(WORKDIR)/0_single_template_and_config.out: $(EXAMPLESDIR)/a.t
