@@ -1,6 +1,7 @@
 #! /usr/bin/python -tt
+import sys
 import jinja2_cli.cli
 
-jinja2_cli.cli.main()
+jinja2_cli.cli.main(sys.argv)
 
 # vim:sw=4:ts=4:et:
