@@ -55,7 +55,8 @@ class Test_10_effectful_functions(unittest.TestCase):
                 self.assertEquals(e.code, code)
 
     def test_10__show_usage(self):
-        run(["--help"])
+        # run(["--help"])
+        self.run_and_check_exit_code(["--help"])
 
     def test_12__wrong_option(self):
         self.run_and_check_exit_code(["--wrong-option-xyz"], _not=True)
