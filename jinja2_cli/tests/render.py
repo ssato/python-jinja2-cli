@@ -5,6 +5,7 @@ import os
 import unittest
 
 import jinja2_cli.render as TT  # Stands for Test Target module.
+import jinja2_cli.compat
 import jinja2_cli.tests.common as C
 
 
@@ -69,6 +70,6 @@ class Test_10_effectful_functions(unittest.TestCase):
         open(os.path.join(self.workdir, tmpl), 'w').write("a = {{ a }}")
 
         TT.renderto(tmpl, dict(a="aaa", ), [self.workdir], output, False)
-        self.assertEquals(TT.compat.copen(output).read(), "a = aaa")
+        self.assertEquals(jinja2_cli.compat.copen(output).read(), "a = aaa")
 
 # vim:sw=4:ts=4:et:

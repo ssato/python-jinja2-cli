@@ -11,7 +11,9 @@ import logging
 import optparse
 import sys
 
-from . import utils, render, dumpvars
+import jinja2_cli.utils
+import jinja2_cli.render
+import jinja2_cli.dumpvars
 
 
 def parse_template_paths(tmpl, paths=None, sep=":"):
@@ -24,13 +26,13 @@ def parse_template_paths(tmpl, paths=None, sep=":"):
     """
     if paths:
         try:
-            paths = render.mk_template_paths(tmpl, paths.split(sep))
+            paths = jinja2_cli.render.mk_template_paths(tmpl, paths.split(sep))
             assert paths
         except:
             logging.warn("Ignored as invalid form: %s", paths)
-            paths = render.mk_template_paths(tmpl, [])
+            paths = jinja2_cli.render.mk_template_paths(tmpl, [])
     else:
-        paths = render.mk_template_paths(tmpl, [])
+        paths = jinja2_cli.render.mk_template_paths(tmpl, [])
 
     logging.debug("Template search paths: %s", str(paths))
     return paths
@@ -82,10 +84,11 @@ def main(argv):
     paths = parse_template_paths(tmpl, options.template_paths)
 
     if options.dumpvars:
-        dumpvars.dumpvars(tmpl, options.output, paths)
+        jinja2_cli.dumpvars.dumpvars(tmpl, options.output, paths)
     else:
-        ctx = utils.parse_and_load_contexts(options.contexts, options.werror)
-        render.renderto(tmpl, ctx, paths, options.output)
+        ctx = jinja2_cli.utils.parse_and_load_contexts(options.contexts,
+                                                       options.werror)
+        jinja2_cli.render.renderto(tmpl, ctx, paths, options.output)
 
 
 if __name__ == '__main__':

@@ -20,7 +20,8 @@ import logging
 import os.path
 import os
 
-from . import compat, utils
+import jinja2_cli.compat
+import jinja2_cli.utils
 
 
 def mk_template_paths(filepath, template_paths=[]):
@@ -30,7 +31,7 @@ def mk_template_paths(filepath, template_paths=[]):
     """
     tmpldir = os.path.abspath(os.path.dirname(filepath))
     if template_paths:
-        return utils.uniq(template_paths + [tmpldir])
+        return jinja2_cli.utils.uniq(template_paths + [tmpldir])
     else:
         return [os.curdir, tmpldir]  # default:
 
@@ -79,7 +80,7 @@ def render(filepath, ctx, paths, ask=False):
     :param ask: Ask user for missing template location if True
     """
     if filepath == '-':
-        return render_s(utils.get_locale_sensitive_stdin().read(),
+        return render_s(jinja2_cli.utils.get_locale_sensitive_stdin().read(),
                         ctx, paths)
     else:
         try:
@@ -89,12 +90,12 @@ def render(filepath, ctx, paths, ask=False):
                 raise RuntimeError("Template '%s' Not found: %s" %
                                    (filepath, str(mtmpl)))
 
-            usr_tmpl = compat.raw_input(
+            usr_tmpl = jinja2_cli.compat.raw_input(
                 "\n*** Missing template '%s'. "
                 "Please enter absolute or relative path starting from "
                 "'.' to the template file: " % mtmpl
             )
-            usr_tmpl = utils.normpath(usr_tmpl.strip())
+            usr_tmpl = jinja2_cli.utils.normpath(usr_tmpl.strip())
             usr_tmpldir = os.path.dirname(usr_tmpl)
 
             return render_impl(usr_tmpl, ctx, paths + [usr_tmpldir])
@@ -118,6 +119,6 @@ def template_path(filepath, paths):
 
 def renderto(tmpl, ctx, paths, output=None, ask=True):
     content = render(tmpl, ctx, paths, ask)
-    utils.write_to_output(content, output)
+    jinja2_cli.utils.write_to_output(content, output)
 
 # vim:sw=4:ts=4:et:

@@ -15,7 +15,8 @@ import jinja2.visitor
 from functools import reduce as foldl
 from operator import concat as listplus
 
-from . import render, utils
+import jinja2_cli.render
+import jinja2_cli.utils
 
 
 class AttrTrackingCodeGenerator(jinja2.compiler.CodeGenerator):
@@ -92,7 +93,7 @@ def get_ast(filepath, paths):
     :param paths: Template search paths
     """
     try:
-        return render.tmpl_env(paths).parse(open(filepath).read())
+        return jinja2_cli.render.tmpl_env(paths).parse(open(filepath).read())
     except:
         return None
 
@@ -105,14 +106,14 @@ def find_templates(filepath, paths, acc=[]):
     :param filepath: Maybe base filepath of template file
     :param paths: Template search paths
     """
-    filepath = render.template_path(filepath, paths)
+    filepath = jinja2_cli.render.template_path(filepath, paths)
     ast = get_ast(filepath, paths)
 
     if ast:
         if filepath not in acc:
             acc.append(filepath)  # Add self.
 
-        ref_templates = [render.template_path(f, paths) for f in
+        ref_templates = [jinja2_cli.render.template_path(f, paths) for f in
                          jinja2.meta.find_referenced_templates(ast) if f]
 
         for f in ref_templates:
@@ -135,7 +136,7 @@ def find_vars_0(filepath, paths):
 
     :return:  [(template_abs_path, [var])]
     """
-    filepath = render.template_path(filepath, paths)
+    filepath = jinja2_cli.render.template_path(filepath, paths)
 
     def find_undecls_0(fpath, paths=paths):
         ast_ = get_ast(fpath, paths)
@@ -149,15 +150,16 @@ def find_vars_0(filepath, paths):
 
 
 def find_vars(filepath, paths):
-    return utils.uniq(foldl(listplus,
-                            (vs[1] for vs in find_vars_0(filepath, paths)),
-                            []))
+    return jinja2_cli.utils.uniq(foldl(listplus,
+                                       (vs[1] for vs in find_vars_0(filepath,
+                                                                    paths)),
+                                       []))
 
 
 def dumpvars(template, output=None, paths=[]):
     vs = find_vars(template, paths)
     vars = ''.join('\n'.join(v) + '\n' for v in
                    sorted(['.'.join(e) for e in elt] for elt in vs))
-    utils.write_to_output(output, vars)
+    jinja2_cli.utils.write_to_output(output, vars)
 
 # vim:sw=4:ts=4:et:

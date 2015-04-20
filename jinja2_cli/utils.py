@@ -10,7 +10,7 @@ import os.path
 import os
 import sys
 
-from . import compat
+import jinja2_cli.compat
 
 try:
     from anyconfig.api import container, load
@@ -30,7 +30,7 @@ except ImportError:
         return json.load(open(filepath))
 
 
-def get_locale_sensitive_stdout(encoding=compat.ENCODING):
+def get_locale_sensitive_stdout(encoding=jinja2_cli.compat.ENCODING):
     """
     :param encoding: Chart sets encoding
     :return: sys.stdout can output encoded strings
@@ -38,7 +38,7 @@ def get_locale_sensitive_stdout(encoding=compat.ENCODING):
     return codecs.getwriter(encoding)(sys.stdout)
 
 
-def get_locale_sensitive_stdin(encoding=compat.ENCODING):
+def get_locale_sensitive_stdin(encoding=jinja2_cli.compat.ENCODING):
     """
     :param encoding: Chart sets encoding
     :return: sys.stdout can output encoded strings
@@ -121,7 +121,7 @@ def concat(xss):
     >>> concat((i, i*2) for i in range(3))
     [0, 0, 1, 2, 2, 4]
     """
-    return list(compat.from_iterable(xs for xs in xss))
+    return list(jinja2_cli.compat.from_iterable(xs for xs in xss))
 
 
 def parse_filespec(fspec, sep=':', gpat='*'):
@@ -157,7 +157,8 @@ def parse_filespec(fspec, sep=':', gpat='*'):
         if gpat in fspec else [flip(tp)]
 
 
-def parse_and_load_contexts(contexts, werr=False, enc=compat.ENCODING):
+def parse_and_load_contexts(contexts, werr=False,
+                            enc=jinja2_cli.compat.ENCODING):
     """
     :param contexts: list of context file specs
     :param werr: Exit immediately if True and any errors occurrs
@@ -180,7 +181,7 @@ def write_to_output(content, output=None):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        compat.copen(output, "w").write(content)
+        jinja2_cli.compat.copen(output, "w").write(content)
     else:
         get_locale_sensitive_stdout().write(content)
 
