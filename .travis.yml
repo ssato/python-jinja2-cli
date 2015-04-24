@@ -6,7 +6,7 @@ python:
   - 3.3
   - 3.4
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION < '2.6' ]]; then pip install --use-mirrors simplejson PyYAML pep8 pylint flake8 Jinja2; else pip install --use-mirrors PyYAML pep8 pylint flake8 Jinja2; fi
+  - if [[ $TRAVIS_PYTHON_VERSION < '2.6' ]]; then pip install --use-mirrors simplejson PyYAML pep8 pylint flake8 Jinja2 coveralls; else pip install --use-mirrors PyYAML pep8 pylint flake8 Jinja2 coveralls; fi
 env:
   - WITH_COVERAGE=1
 script:
