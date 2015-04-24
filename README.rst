@@ -5,6 +5,14 @@ About
    :target: https://travis-ci.org/ssato/python-jinja2-cli
    :alt: Test status
 
+.. image:: https://coveralls.io/repos/ssato/python-jinja2-cli/badge.png
+   :target: https://coveralls.io/r/ssato/python-jinja2-cli
+   :alt: Coverage Status
+
+.. image:: https://landscape.io/github/ssato/python-jinja2-cli/master/landscape.png
+   :target: https://landscape.io/github/ssato/python-jinja2-cli/master
+   :alt: Code Health
+
 A CLI frontend for python-jinja2 based on:
 
 * https://github.com/ssato/misc/blob/master/jinja2_template_render.py
