@@ -160,6 +160,6 @@ def dumpvars(template, output=None, paths=[]):
     vs = find_vars(template, paths)
     vars = ''.join('\n'.join(v) + '\n' for v in
                    sorted(['.'.join(e) for e in elt] for elt in vs))
-    jinja2_cli.utils.write_to_output(output, vars)
+    jinja2_cli.utils.write_to_output(vars, output)
 
 # vim:sw=4:ts=4:et:
