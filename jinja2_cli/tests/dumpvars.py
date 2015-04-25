@@ -8,6 +8,7 @@ import jinja2_cli.dumpvars as TT
 
 
 class Test_dumpvar(unittest.TestCase):
+
     def test_dumpvars(self):
         tmpl = '{{ a }}{{ b.b0 }}{{ c.c0.c1 + c.c0.c2 + c.c1}}'
         env = jinja2.Environment()
