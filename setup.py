@@ -58,7 +58,7 @@ class RpmCommand(SrpmCommand):
 
 setup(name=PACKAGE,
       version=VERSION,
-      description="A CUI frontend for Jinja2 template engine.",
+      description="A CLI frontend for Jinja2 template engine.",
       author="Satoru SATOH",
       author_email="ssato@redhat.com",
       license="BSD",

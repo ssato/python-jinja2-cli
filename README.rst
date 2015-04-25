@@ -1,3 +1,7 @@
+==================
+python-jinja2-cli
+==================
+
 About
 ======
 
@@ -14,16 +18,10 @@ About
    :alt: Code Health
 
 A CLI frontend for python-jinja2 based on:
+https://github.com/ssato/misc/blob/master/jinja2_template_render.py
 
-* https://github.com/ssato/misc/blob/master/jinja2_template_render.py
-
-Also imported some ideas in:
-
-* https://github.com/mitsuhiko/jinja2/pull/129
-  (https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py)
-
-Author: Satoru SATOH <ssato@redhat.com>
-License: Same as python-jinja2, that is, BSD3.
+- Author: Satoru SATOH <ssato@redhat.com>
+- License: Same as python-jinja2, that is, BSD3.
 
 Features
 =========
@@ -126,6 +124,12 @@ YAML/JSON/... context files and render (compile) jinja2-based templates, I
 guess.
 
 - https://github.com/mattrobenolt/jinja2-cli
+
+  - https://github.com/mitsuhiko/jinja2/pull/129
+    (https://github.com/mattrobenolt/jinja2/blob/cli/jinja2/cli.py)
+
+    My implementation imported some ideas from this one.
+
 - https://github.com/kolypto/j2cli
 - https://bitbucket.org/luisfernando/jinjaconfig
 
