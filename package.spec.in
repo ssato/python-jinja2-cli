@@ -104,7 +104,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Sun Apr 19 2015 Satoru SATOH <ssato@redhat.com> - 0.0.4.999-1
+* Sun Apr 26 2015 Satoru SATOH <ssato@redhat.com> - 0.0.5-1
 - Re-organized module internals
 - Merge two CLI function (render and dumpvars) into one
 - Refactoring, many additional test cases, cleanups and bug fixes
