@@ -34,6 +34,8 @@ def get_locale_sensitive_stdout(encoding=jinja2_cli.compat.ENCODING):
     """
     :param encoding: Chart sets encoding
     :return: sys.stdout can output encoded strings
+
+    >>> _t = get_locale_sensitive_stdout("UTF-8")
     """
     return codecs.getwriter(encoding)(sys.stdout)
 
@@ -42,6 +44,8 @@ def get_locale_sensitive_stdin(encoding=jinja2_cli.compat.ENCODING):
     """
     :param encoding: Chart sets encoding
     :return: sys.stdout can output encoded strings
+
+    >>> _t = get_locale_sensitive_stdin("UTF-8")
     """
     return codecs.getreader(encoding)(sys.stdin)
 
