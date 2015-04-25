@@ -23,16 +23,21 @@ def parse_template_paths(tmpl, paths=None, sep=":"):
     :param tmpl: Template file to render
     :param paths: str to specify template path list separated by `sep`
     :param sep: template path list separator
+
+    >>> parse_template_paths("/etc/hosts", ".:/tmp")
+    ['.', '/tmp', '/etc']
+    >>> parse_template_paths("/etc/hosts", dict())
+    ['.', '/etc']
     """
-    if paths:
-        try:
-            paths = jinja2_cli.render.mk_template_paths(tmpl, paths.split(sep))
-            assert paths
-        except:
-            logging.warn("Ignored as invalid form: %s", paths)
-            paths = jinja2_cli.render.mk_template_paths(tmpl, [])
-    else:
+    if paths is None:
         paths = jinja2_cli.render.mk_template_paths(tmpl, [])
+    else:
+        try:
+            ps = paths.split(sep)
+            paths = jinja2_cli.render.mk_template_paths(tmpl, ps)
+        except:
+            logging.warn("Ignored as invalid form: %s", str(paths))
+            paths = jinja2_cli.render.mk_template_paths(tmpl, [])
 
     logging.debug("Template search paths: %s", str(paths))
     return paths
