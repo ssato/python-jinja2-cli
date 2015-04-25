@@ -34,20 +34,12 @@ def _from_iterable(iterables):
             yield element
 
 
-def copen(filepath, flag='r', encoding=ENCODING):
-    """
-    FIXME: How to test this ?
-
-    >>> c = copen(__file__)
-    >>> c is not None
-    True
-    """
-    return codecs.open(filepath, flag, encoding)
-
-
 if IS_PYTHON_3:
     from_iterable = itertools.chain.from_iterable
     raw_input = input
+
+    def copen(filepath, flag='r', encoding=ENCODING):
+        return codecs.open(filepath, flag + 'b', encoding)
 else:
     try:
         from_iterable = itertools.chain.from_iterable
@@ -55,5 +47,15 @@ else:
         from_iterable = _from_iterable
 
     raw_input = raw_input
+
+    def copen(filepath, flag='r', encoding=ENCODING):
+        """
+        FIXME: How to test this ?
+
+        >>> c = copen(__file__)
+        >>> c is not None
+        True
+        """
+        return codecs.open(filepath, flag, encoding)
 
 # vim:sw=4:ts=4:et:

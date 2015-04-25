@@ -3,6 +3,7 @@
 :license: BSD-3
 """
 from __future__ import absolute_import
+from __future__ import print_function
 
 import codecs
 import glob
@@ -179,14 +180,14 @@ def parse_and_load_contexts(contexts, werr=False,
     return ctx
 
 
-def write_to_output(content, output=None):
+def write_to_output(content, output=None, encoding=jinja2_cli.compat.ENCODING):
     if output and not output == '-':
         outdir = os.path.dirname(output)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
-        jinja2_cli.compat.copen(output, "w").write(content)
+        jinja2_cli.compat.copen(output, 'w').write(content)
     else:
-        get_locale_sensitive_stdout().write(content)
+        print(content, get_locale_sensitive_stdout())
 
 # vim:sw=4:ts=4:et:
