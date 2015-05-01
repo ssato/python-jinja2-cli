@@ -183,7 +183,7 @@ def parse_and_load_contexts(contexts, werr=False,
 def write_to_output(content, output=None, encoding=jinja2_cli.compat.ENCODING):
     if output and not output == '-':
         outdir = os.path.dirname(output)
-        if not os.path.exists(outdir):
+        if outdir and not os.path.exists(outdir):
             os.makedirs(outdir)
 
         jinja2_cli.compat.copen(output, 'w').write(content)
