@@ -2,7 +2,7 @@
 python-jinja2-cli
 ==================
 
-.. note:: This project is suspended. Please try its successor and extended version called `python-anytemplate <https://github.com/ssato/python-anytemplate>`_ instead.
+.. note:: **This project is suspended**. Please try its successor and extended version called `python-anytemplate <https://github.com/ssato/python-anytemplate>`_ instead.
 
 About
 ======
